@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+:root {
+  --background-sidebar: #1a1a1a;
+  --background-main: #242424;
+  --background-card: #2d2d2d;
+  --text-primary: #f5f5f5;
+  --text-secondary: #a0a0a0;
+  --accent-button: #4caf9e;
+  --item-hover: #333333;
+  --border-color: #3a3a3a;
+}
+
+body {
+  background-color: var(--background-main);
+  color: var(--text-primary);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Card and UI elements styling */
+.card {
+  background-color: var(--background-card);
+  border: 1px solid var(--border-color);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: var(--accent-button);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #3d9b8d;
+}
+
+.btn-secondary {
+  background-color: #4a4a4a;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #555555;
+}
+
+/* Navigation items */
+.nav-item {
+  background-color: #444444;
+  color: var(--text-primary);
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background-color: #555555;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555555;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666666;
+}

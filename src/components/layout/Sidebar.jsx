@@ -72,7 +72,7 @@ export default function Sidebar() {
             </h2>
 
 
-            <div className="max-h-3/4 overflow-y-auto pr-2 mb-2">
+            <div className="max-h-3/4 overflow-y-auto pr-2 mb-5">
               {dummyGroups.map((group) => (
                 <Link 
                   href={`/dashboard/groups/${group.id}`}
@@ -90,7 +90,7 @@ export default function Sidebar() {
             </div>
             <Link
               href="/dashboard/groups"
-              className="mt-3 flex items-center justify-center p-2 text-[#4caf9e] border border-[#444444] rounded mb-4 hover:bg-[#333333]"
+              className="mt-3 mb-1 flex items-center justify-center p-2 text-[#4caf9e] border border-[#444444] shadow-[0px_1px_15px_0px_rgba(17,17,17,1.00)] rounded hover:bg-[#333333]"
             >
               + FIND MORE
             </Link>

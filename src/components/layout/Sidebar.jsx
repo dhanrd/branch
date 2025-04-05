@@ -91,8 +91,7 @@ export default function Sidebar() {
           onClick={logout}
           className="flex items-center mt-2 text-red-400"
         >
-          <span className="rounded-full w-6 h-6 flex items-center justify-center bg-black mr-2">N</span>
-          out
+        Log Out
         </button>
       </div>
     </div>

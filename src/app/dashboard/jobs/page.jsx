@@ -47,6 +47,16 @@ export default function Jobs() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [filterOption, setFilterOption] = useState('Relevant');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  
+  // New state for saved and applied jobs
+  const [savedJobs, setSavedJobs] = useState([]);
+  const [appliedJobs, setAppliedJobs] = useState([]);
+  
+  // New state for showing our modals
+  const [showApplyConfirm, setShowApplyConfirm] = useState(false);
+  const [showSaveNotification, setShowSaveNotification] = useState(false);
+  const [showSavedJobsModal, setShowSavedJobsModal] = useState(false);
+  const [showAppliedJobsModal, setShowAppliedJobsModal] = useState(false);
 
   // Show all jobs
   const filteredJobs = jobs;
@@ -64,7 +74,49 @@ export default function Jobs() {
   const handleClickOutside = (e) => {
     if (e.target.classList.contains('modal-overlay')) {
       setSelectedJob(null);
+      setShowApplyConfirm(false);
+      setShowSaveNotification(false);
     }
+  };
+  
+  // Function to handle apply button click
+  const handleApply = () => {
+    setShowApplyConfirm(true);
+  };
+  
+  // Function to confirm application
+  const confirmApply = () => {
+    // Check if job is already in applied jobs
+    if (!appliedJobs.some(job => job.id === selectedJob.id)) {
+      setAppliedJobs([...appliedJobs, selectedJob]);
+    }
+    setShowApplyConfirm(false);
+  };
+  
+  // Function to handle save button click
+  const handleSave = () => {
+    // Check if job is already saved
+    if (!savedJobs.some(job => job.id === selectedJob.id)) {
+      setSavedJobs([...savedJobs, selectedJob]);
+      setShowSaveNotification(true);
+      
+      // Auto-hide notification after 2 seconds
+      setTimeout(() => {
+        setShowSaveNotification(false);
+      }, 2000);
+    }
+  };
+  
+  // Function to remove job from saved list
+  const removeSavedJob = (jobId) => {
+    setSavedJobs(savedJobs.filter(job => job.id !== jobId));
+  };
+  
+  // Function to view job details from saved/applied lists
+  const viewJobDetails = (job) => {
+    setSelectedJob(job);
+    setShowSavedJobsModal(false);
+    setShowAppliedJobsModal(false);
   };
 
   return (
@@ -152,18 +204,34 @@ export default function Jobs() {
         
         <div className="md:col-span-1">
           <div className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-lg">
-            <button className="flex items-center mb-4 w-full">
+            <button 
+              className="flex items-center mb-4 w-full hover:bg-[#333333] p-2 rounded transition-colors"
+              onClick={() => setShowSavedJobsModal(true)}
+            >
               <svg className="w-6 h-6 text-[#888888] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
               </svg>
               <span className="text-[#888888]">Saved Jobs</span>
+              {savedJobs.length > 0 && (
+                <span className="ml-auto bg-[#4caf9e] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                  {savedJobs.length}
+                </span>
+              )}
             </button>
             
-            <button className="flex items-center w-full">
+            <button 
+              className="flex items-center w-full hover:bg-[#333333] p-2 rounded transition-colors"
+              onClick={() => setShowAppliedJobsModal(true)}
+            >
               <svg className="w-6 h-6 text-[#888888] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
               </svg>
               <span className="text-[#888888]">Applied</span>
+              {appliedJobs.length > 0 && (
+                <span className="ml-auto bg-[#4caf9e] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                  {appliedJobs.length}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -175,7 +243,7 @@ export default function Jobs() {
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 modal-overlay"
           onClick={handleClickOutside}
         >
-          <div className="bg-[#2d2d2d] border border-[#3a3a3a] rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div className="bg-[#2d2d2d] border border-[#3a3a3a] rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-start mb-4">
               <h2 className="text-xl font-bold text-white">{selectedJob.title}</h2>
               <button 
@@ -208,12 +276,157 @@ export default function Jobs() {
             
             {user.role === 'student' && (
               <div className="flex space-x-4">
-                <button className="px-6 py-2 bg-[#4caf9e] text-white rounded-lg">
+                <button 
+                  className="px-6 py-2 bg-[#4caf9e] text-white rounded-lg hover:bg-[#3d9b8d] transition-colors"
+                  onClick={handleApply}
+                >
                   Apply
                 </button>
-                <button className="px-6 py-2 border border-[#3a3a3a] text-white rounded-lg">
-                  Save
+                <button 
+                  className={`px-6 py-2 border text-white rounded-lg transition-colors ${
+                    savedJobs.some(job => job.id === selectedJob.id) 
+                      ? 'bg-[#4caf9e] border-[#4caf9e]' 
+                      : 'border-[#3a3a3a] hover:bg-[#333333]'
+                  }`}
+                  onClick={handleSave}
+                >
+                  {savedJobs.some(job => job.id === selectedJob.id) ? 'Saved' : 'Save'}
                 </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Apply confirmation modal */}
+      {showApplyConfirm && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 modal-overlay"
+          onClick={handleClickOutside}
+        >
+          <div className="bg-[#2d2d2d] border border-[#3a3a3a] rounded-lg p-6 max-w-md w-full" onClick={e => e.stopPropagation()}>
+            <h2 className="text-xl font-bold text-white mb-4">redirecting to external website</h2>
+            <p className="text-[#e0e0e0] mb-6">
+              this job application requires you to continue on the company's website. 
+              are you sure you want to proceed?
+            </p>
+            <div className="flex space-x-4">
+              <button 
+                className="px-6 py-2 bg-[#4caf9e] text-white rounded-lg flex-1 hover:bg-[#3d9b8d] transition-colors"
+                onClick={confirmApply}
+              >
+                yes, continue
+              </button>
+              <button 
+                className="px-6 py-2 border border-[#3a3a3a] text-white rounded-lg flex-1 hover:bg-[#333333] transition-colors"
+                onClick={() => setShowApplyConfirm(false)}
+              >
+                cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Save notification */}
+      {showSaveNotification && (
+        <div className="fixed bottom-4 right-4 bg-[#4caf9e] text-white py-2 px-4 rounded-lg shadow-lg">
+          job saved!
+        </div>
+      )}
+      
+      {/* Saved Jobs Modal */}
+      {showSavedJobsModal && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 modal-overlay"
+          onClick={handleClickOutside}
+        >
+          <div className="bg-[#2d2d2d] border border-[#3a3a3a] rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-white">saved jobs</h2>
+              <button 
+                onClick={() => setShowSavedJobsModal(false)}
+                className="text-[#888888] hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            
+            {savedJobs.length > 0 ? (
+              <div className="space-y-3">
+                {savedJobs.map(job => (
+                  <div key={job.id} className="p-3 border border-[#3a3a3a] bg-[#333333] rounded-lg">
+                    <div className="flex justify-between">
+                      <div>
+                        <h3 
+                          className="font-medium text-white hover:text-[#4caf9e] cursor-pointer"
+                          onClick={() => viewJobDetails(job)}
+                        >
+                          {job.title}
+                        </h3>
+                        <div className="text-sm text-[#a0a0a0]">{job.company}</div>
+                        <div className="text-sm text-[#a0a0a0]">{job.location}</div>
+                      </div>
+                      
+                      <button 
+                        className="text-[#888888] hover:text-white self-start"
+                        onClick={() => removeSavedJob(job.id)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-[#a0a0a0]">
+                you haven't saved any jobs yet.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Applied Jobs Modal */}
+      {showAppliedJobsModal && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 modal-overlay"
+          onClick={handleClickOutside}
+        >
+          <div className="bg-[#2d2d2d] border border-[#3a3a3a] rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-white">applied jobs</h2>
+              <button 
+                onClick={() => setShowAppliedJobsModal(false)}
+                className="text-[#888888] hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            
+            {appliedJobs.length > 0 ? (
+              <div className="space-y-3">
+                {appliedJobs.map(job => (
+                  <div key={job.id} className="p-3 border border-[#3a3a3a] bg-[#333333] rounded-lg">
+                    <div className="flex justify-between">
+                      <div>
+                        <h3 
+                          className="font-medium text-white hover:text-[#4caf9e] cursor-pointer"
+                          onClick={() => viewJobDetails(job)}
+                        >
+                          {job.title}
+                        </h3>
+                        <div className="text-sm text-[#a0a0a0]">{job.company}</div>
+                        <div className="text-sm text-[#a0a0a0]">{job.location}</div>
+                        <div className="text-xs text-[#4caf9e] mt-1">Application Submitted</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-[#a0a0a0]">
+                you haven't applied to any jobs yet.
               </div>
             )}
           </div>

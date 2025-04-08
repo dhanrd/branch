@@ -7,7 +7,7 @@ This README should serve as a comprehensive overview of the codebase, explaining
 
 branch is a niche social media network built using react and next.js. it's designed to connect students with each other, clubs, events, and job opportunities.
 
-## tech stack.
+## tech stack
 
 - **react 19**: core ui library
 - **next.js 15**: react framework with app router

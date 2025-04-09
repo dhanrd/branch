@@ -71,34 +71,38 @@ export default function Groups() {
               {/* Clubs section */}
               <div className="mb-6">
                 {categories.map((category)=> (
-                  <div key={category}>
-                    <h3 className="text-lg font-medium mb-3 text-white">
-                      {category.toUpperCase()}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {dummyGroups.filter(group => group.categories.includes(category)).map((group) => (
-                        <Link
-                          href={`/dashboard/groups/${group.id}`} 
-                          key={group.id} 
-                          className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                        >
-                          <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                        </Link>
-                      ))}
+                  <div className="mb-5 border-b border-[#3A3A3A] pb-2"> 
+                    <div key={category}>
+                      <h3 className="text-lg font-medium mb-3 text-white">
+                        {category.toUpperCase()}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> 
+                        {dummyGroups.filter(group => group.categories.includes(category)).map((group) => (
+                          <Link
+                            href={`/dashboard/groups/${group.id}`} 
+                            key={group.id} 
+                            className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                          >
+                            <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                          </Link>
+                        ))}
+                      </div>
+                      <div className="flex justify-end mt-4">
+                        <button className="text-[#4caf9e] hover:text-[#a7ece1] cursor-pointer"
+                          onClick={() => {setShowCategory(true);
+                            setCategory(category);
+                          }}
+                            >+ SEE MORE
+                        </button> 
+                      </div> 
                     </div>
-                    <div className="flex justify-end mt-2">
-                      <button className="text-[#4caf9e] hover:text-[#a7ece1] cursor-pointer"
-                        onClick={() => {setShowCategory(true);
-                          setCategory(category);
-                        }}
-                          >+ SEE MORE
-                      </button> 
-                    </div> 
                   </div>
                 ))}
               </div>
             </div>
           </>
         ) : (
+
+          // Show groups of the selected category 
           <div className="mt-6 p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A] relative">
             <>
               <h2 className = "text-lg font-medium mb-4 text-white">{category.toUpperCase()}</h2>
@@ -108,33 +112,18 @@ export default function Groups() {
                   {"< BACK"}
                 </button>  
             </>
-            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              
-              {category === 'clubs' && dummyClubGroups.map((group) => (
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {dummyGroups.filter(group => group.categories.includes(category)).map((group) => (
                 <div 
                   key={group.id} 
                   className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
                 >
                   <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
                 </div>
-              ))}
-              {category === 'hobbies' && dummyHobbyGroups.map((group) => (
-                <div 
-                  key={group.id} 
-                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                >
-                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                </div>
-              ))}
-              {category === 'education' && dummyEducationGroups.map((group) => (
-                <div key={group.id}
-                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                >
-                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                </div>
-              ))}
+              ))}          
                 
-            </div> */}
+            </div>
 
           </div>
 

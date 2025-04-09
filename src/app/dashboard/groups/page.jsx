@@ -71,8 +71,8 @@ export default function Groups() {
               {/* Clubs section */}
               <div className="mb-6">
                 {categories.map((category)=> (
-                  <div className="mb-5 border-b border-[#3A3A3A] pb-2"> 
-                    <div key={category}>
+                  <div key={category} className="mb-5 border-b border-[#3A3A3A] pb-2"> 
+                    <div>
                       <h3 className="text-lg font-medium mb-3 text-white">
                         {category.toUpperCase()}</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> 

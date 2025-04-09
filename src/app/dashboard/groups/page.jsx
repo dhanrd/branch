@@ -93,6 +93,8 @@ const dummyPopularGroups = [
 export default function Groups() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showCategory, setShowCategory] = useState(false);
+  const [category, setCategory] = useState("");
   
   // Redirect employers who shouldn't have access to groups
   if (user?.role === 'employer') {
@@ -125,79 +127,111 @@ export default function Groups() {
           </div>
         </div>
         
-        {/* Recommended section */}
-        <div className="mb-8 p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
-          <h2 className="text-xl font-medium mb-4 text-white">RECOMMENDED</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {dummyRecommendedGroups.map((group) => (
-              <div 
-                key={group.id} 
-                className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-              >
-                <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+        {!showCategory ? (
+          <>
+            {/* Recommended section */}
+            <div className="mb-8 p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
+              <h2 className="text-xl font-medium mb-4 text-white">RECOMMENDED</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {dummyRecommendedGroups.map((group) => (
+                  <div 
+                    key={group.id} 
+                    className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                  >
+                    <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            
+            {/* Browse by category */}
+            <div className="p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
+              <h2 className="text-xl font-medium mb-4 text-white">BROWSE BY CATEGORY</h2>
+              
+              {/* Clubs section */}
+              <div className="mb-6">
+                <h3 className="text-lg font-medium mb-3 text-white">CLUBS</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {dummyClubGroups.map((group) => (
+                    <div 
+                      key={group.id} 
+                      className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                    >
+                      <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-end mt-2">
+                  <button className="text-[#4caf9e] hover:text-[#a7ece1] cursor-pointer"
+                    onClick={() => {setShowCategory(true);
+                      setCategory('clubs');
+                    }}
+                      >+ SEE MORE
+                  </button>                
+                </div>
+              </div>
+              
+              {/* Hobbies section */}
+              <div className="mb-6">
+                <h3 className="text-lg font-medium mb-3 text-white">HOBBIES</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {dummyHobbyGroups.map((group) => (
+                    <div 
+                      key={group.id} 
+                      className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                    >
+                      <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-end mt-2">
+                  <button className="text-[#4caf9e] hover:text-[#a7ece1] cursor-pointer"
+                    onClick={() => {setShowCategory(true);
+                      setCategory('hobbies');
+                    }}
+                      >+ SEE MORE
+                  </button>
+                </div>
+              </div>
+              
+              {/* Education section */}
+              <div>
+                <h3 className="text-lg font-medium mb-3 text-white">EDUCATION</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {dummyEducationGroups.map((group) => (
+                    <div 
+                      key={group.id} 
+                      className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                    >
+                      <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-end mt-2">
+                  <button className="text-[#4caf9e] hover:text-[#a7ece1] cursor-pointer"
+                    onClick={() => {setShowCategory(true);
+                      setCategory('education');
+                    }}
+                      >+ SEE MORE
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="mt-6 p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A] relative">
+            <>
+              <h2 className = "text-lg font-medium mb-4 text-white">{category.toUpperCase()}</h2>
+              <button
+                className="text-(--text-secondary) absolute top-6 right-4 text-sm hover:text-(--text-primary) cursor-pointer"
+                onClick={() => setShowCategory(false)}>
+                  {"< BACK"}
+                </button>
+            </>
           </div>
-        </div>
+
+        )}
         
-        {/* Browse by category */}
-        <div className="p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
-          <h2 className="text-xl font-medium mb-4 text-white">BROWSE BY CATEGORY</h2>
-          
-          {/* Clubs section */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3 text-white">CLUBS</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dummyClubGroups.map((group) => (
-                <div 
-                  key={group.id} 
-                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                >
-                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end mt-2">
-              <button className="text-[#4caf9e]">+ SEE MORE</button>
-            </div>
-          </div>
-          
-          {/* Hobbies section */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3 text-white">HOBBIES</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dummyHobbyGroups.map((group) => (
-                <div 
-                  key={group.id} 
-                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                >
-                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end mt-2">
-              <button className="text-[#4caf9e]">+ SEE MORE</button>
-            </div>
-          </div>
-          
-          {/* Education section */}
-          <div>
-            <h3 className="text-lg font-medium mb-3 text-white">EDUCATION</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dummyEducationGroups.map((group) => (
-                <div 
-                  key={group.id} 
-                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                >
-                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end mt-2">
-              <button className="text-[#4caf9e]">+ SEE MORE</button>
-            </div>
-          </div>
-        </div>
       </div>
       
       {/* Right sidebar */}

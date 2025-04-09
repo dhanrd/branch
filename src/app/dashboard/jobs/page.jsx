@@ -7,36 +7,99 @@ import { useAuth } from '@/context/AuthContext';
 const dummyJobs = [
   {
     id: 1,
-    title: 'Intern Developer Position',
-    company: 'BigCompany',
+    title: 'Full Stack Developer Intern',
+    company: 'Solium (Shareworks)',
     location: 'Calgary, AB',
     type: 'Internship',
-    description: 'Looking for passionate intern developers to join our team for the summer.',
-    requirements: 'Knowledge of JavaScript, React, and Node.js.',
+    description: 'Join our development team to build financial technology solutions for equity management. You\'ll work with experienced developers on real projects that impact our clients globally.',
+    requirements: 'Experience with JavaScript, React, and Node.js. Knowledge of RESTful APIs. Currently enrolled in Computer Science or Software Engineering program.',
     posted: '2 days ago',
     deadline: '2025-04-30',
+    salary: '$25-30/hour'
   },
   {
     id: 2,
-    title: 'Intern Software Position',
-    company: 'BigCompany',
+    title: 'Software Engineering Intern',
+    company: 'Benevity',
     location: 'Calgary, AB',
     type: 'Internship',
-    description: 'Join our software team to work on exciting new projects.',
-    requirements: 'Experience with Java and database management.',
+    description: 'Help build tech solutions that power corporate giving and volunteer programs. You\'ll contribute to our cloud platform that connects companies with causes worldwide.',
+    requirements: 'Proficiency in Java and SQL. Knowledge of Spring Framework is a plus. Strong understanding of OOP concepts.',
     posted: '3 days ago',
     deadline: '2025-05-15',
+    salary: '$24-28/hour'
   },
   {
     id: 3,
-    title: 'Intern Designer Position',
-    company: 'BigCompany',
+    title: 'Machine Learning Co-op Student',
+    company: 'ATB Financial',
     location: 'Calgary, AB',
-    type: 'Internship',
-    description: 'Design creative user interfaces for our products.',
-    requirements: 'Proficiency in UI/UX design principles and tools.',
+    type: 'Co-op',
+    description: 'Apply machine learning techniques to financial data to develop innovative solutions for our customers and internal operations.',
+    requirements: 'Experience with Python, pandas, and machine learning libraries like TensorFlow or PyTorch. Strong mathematical background.',
     posted: '1 week ago',
     deadline: '2025-04-22',
+    salary: '$26-32/hour'
+  },
+  {
+    id: 4,
+    title: 'Junior Cybersecurity Analyst',
+    company: 'TELUS',
+    location: 'Calgary, AB',
+    type: 'New Grad',
+    description: 'Join our security operations team to monitor, identify and respond to security threats across our network infrastructure.',
+    requirements: 'Degree in Computer Science, Information Security or related field. Knowledge of network security principles and common security tools.',
+    posted: '5 days ago',
+    deadline: '2025-05-01',
+    salary: '$65,000-75,000/year'
+  },
+  {
+    id: 5,
+    title: 'Cloud Engineering Intern',
+    company: 'TC Energy',
+    location: 'Calgary, AB',
+    type: 'Internship',
+    description: 'Work with our cloud engineering team to develop and maintain our AWS infrastructure, implement CI/CD pipelines, and automate cloud processes.',
+    requirements: 'Experience with AWS services, infrastructure as code (Terraform/CloudFormation), and scripting languages like Python or Bash.',
+    posted: '2 weeks ago',
+    deadline: '2025-04-15',
+    salary: '$23-27/hour'
+  },
+  {
+    id: 6,
+    title: 'Software Developer New Grad',
+    company: 'Helcim',
+    location: 'Calgary, AB',
+    type: 'New Grad',
+    description: 'Join our growing fintech company to help build payment processing solutions for businesses across North America.',
+    requirements: 'Degree in Computer Science or related field. Experience with web development technologies and payment systems is a plus.',
+    posted: '1 week ago',
+    deadline: '2025-05-30',
+    salary: '$70,000-80,000/year'
+  },
+  {
+    id: 7,
+    title: 'Data Science Intern',
+    company: 'AltaML',
+    location: 'Calgary, AB',
+    type: 'Internship',
+    description: 'Apply data science techniques to solve real business problems for our clients in energy, healthcare, and finance sectors.',
+    requirements: 'Strong background in statistics and experience with data analysis tools. Knowledge of machine learning frameworks and SQL.',
+    posted: '3 days ago',
+    deadline: '2025-04-25',
+    salary: '$24-29/hour'
+  },
+  {
+    id: 8,
+    title: 'DevOps Co-op Student',
+    company: 'Symend',
+    location: 'Calgary, AB',
+    type: 'Co-op',
+    description: 'Help our engineering team build and maintain our deployment pipelines, monitoring systems, and cloud infrastructure.',
+    requirements: 'Knowledge of Linux, containerization, and cloud platforms (AWS/Azure/GCP). Experience with CI/CD tools like Jenkins or GitHub Actions.',
+    posted: '1 week ago',
+    deadline: '2025-05-10',
+    salary: '$25-28/hour'
   }
 ];
 
@@ -262,6 +325,9 @@ export default function Jobs() {
             <div className="mb-6">
               <div><span className="font-medium text-[#e0e0e0]">Posted:</span> <span className="text-[#a0a0a0]">{selectedJob.posted}</span></div>
               <div><span className="font-medium text-[#e0e0e0]">Application Deadline:</span> <span className="text-[#a0a0a0]">{selectedJob.deadline}</span></div>
+              {selectedJob.salary && (
+                <div><span className="font-medium text-[#e0e0e0]">Compensation:</span> <span className="text-[#a0a0a0]">{selectedJob.salary}</span></div>
+              )}
             </div>
             
             <div className="mb-6">

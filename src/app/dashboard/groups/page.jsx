@@ -56,7 +56,7 @@ export default function Groups() {
                   <Link
                     href={`/dashboard/groups/${group.id}`} 
                     key={group.id} 
-                    className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                    className="p-8 bg-[#444444] hover:bg-[#555555] rounded-lg flex items-center justify-center"
                   >
                     <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
                   </Link>
@@ -80,7 +80,7 @@ export default function Groups() {
                           <Link
                             href={`/dashboard/groups/${group.id}`} 
                             key={group.id} 
-                            className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                            className="p-8 bg-[#444444] hover:bg-[#555555] rounded-lg flex items-center justify-center"
                           >
                             <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
                           </Link>
@@ -115,12 +115,13 @@ export default function Groups() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {dummyGroups.filter(group => group.categories.includes(category)).map((group) => (
-                <div 
-                  key={group.id} 
-                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                >
-                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                </div>
+                <Link
+                href={`/dashboard/groups/${group.id}`} 
+                key={group.id} 
+                className="p-8 bg-[#444444] hover:bg-[#555555] rounded-lg flex items-center justify-center"
+              >
+                <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+              </Link>
               ))}          
                 
             </div>

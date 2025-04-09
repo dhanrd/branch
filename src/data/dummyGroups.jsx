@@ -2,19 +2,35 @@
 const dummyGroups = [
     {
         id: 1,
-        name: 'STUDY TIPS',
-        members: 126,
-        categories: ['education', 'recommended'],
-      },
-      {
-        id: 2,
         name: 'MACHINE LEARNING',
         members: 342,
         categories: ['education', 'recommended'],
 
       },
       {
+        id: 2,
+        name: 'COMPUTER SCIENCE UNDERGRADUATE SOCIETY',
+        members: 423,
+        categories: ['clubs', 'popular'],
+        newMembers: '6 new members in the past day!',
+
+      },
+      {
         id: 3,
+        name: 'WEB DEVELOPMENT',
+        members: 102,
+        categories: ['education'],
+
+      },
+    {
+        id: 6,
+        name: 'STUDY TIPS',
+        members: 126,
+        categories: ['education', 'recommended'],
+      },
+      
+      {
+        id: 15,
         name: 'LEARNING C++',
         members: 189,
         categories: ['education', 'recommended'],
@@ -40,14 +56,7 @@ const dummyGroups = [
         members: 156,
         categories: ['clubs'],
       },
-      {
-        id: 6,
-        name: 'COMPUTER SCIENCE UNDERGRADUATE SOCIETY',
-        members: 423,
-        categories: ['clubs', 'popular'],
-        newMembers: '6 new members in the past day!',
-
-      },
+      
       {
         id: 7,
         name: 'MUSIC',

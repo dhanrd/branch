@@ -3,97 +3,18 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-
-// Dummy group data
-const dummyRecommendedGroups = [
-  {
-    id: 1,
-    name: 'STUDY TIPS',
-    members: 126,
-  },
-  {
-    id: 2,
-    name: 'MACHINE LEARNING',
-    members: 342,
-  },
-  {
-    id: 3,
-    name: 'LEARNING C++',
-    members: 189,
-  },
-];
-
-const dummyClubGroups = [
-  {
-    id: 4,
-    name: 'WOMEN IN COMPUTER SCIENCE',
-    members: 89,
-  },
-  {
-    id: 5,
-    name: 'COMPETITIVE PROGRAMMING CLUB',
-    members: 156,
-  },
-  {
-    id: 6,
-    name: 'COMPUTER SCIENCE UNDERGRADUATE SOCIETY',
-    members: 423,
-  },
-];
-
-const dummyHobbyGroups = [
-  {
-    id: 7,
-    name: 'MUSIC',
-    members: 213,
-  },
-  {
-    id: 8,
-    name: 'HOCKEY',
-    members: 187,
-  },
-  {
-    id: 9,
-    name: 'BAKING',
-    members: 109,
-  },
-];
-
-const dummyEducationGroups = [
-  {
-    id: 10,
-    name: 'RESUME HELP',
-    members: 278,
-  },
-  {
-    id: 11,
-    name: '355 STUDY GROUP',
-    members: 76,
-  },
-  {
-    id: 12,
-    name: 'LEARNING C++',
-    members: 189,
-  },
-];
-
-const dummyPopularGroups = [
-  {
-    id: 13,
-    name: 'COMPUTER SCIENCE UNDERGRADUATE SOCIETY',
-    newMembers: '6 new members in the past day!',
-  },
-  {
-    id: 14,
-    name: 'CALGARY ESPORTS UNITED',
-    mostActive: 'Most active',
-  },
-];
+import dummyGroups from '@/data/dummyGroups';
+console.log(dummyGroups);
 
 export default function Groups() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const [showCategory, setShowCategory] = useState(false);
+  const [category, setCategory] = useState("");
+  const recommendedGroups = dummyGroups.filter(group => group.categories.includes('recommended'));
+  const popularGroups = dummyGroups.filter(group => group.categories.includes('popular'));
+  const categories = ['clubs', 'hobbies', 'education'];
+
   // Redirect employers who shouldn't have access to groups
   if (user?.role === 'employer') {
     return (
@@ -125,79 +46,90 @@ export default function Groups() {
           </div>
         </div>
         
-        {/* Recommended section */}
-        <div className="mb-8 p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
-          <h2 className="text-xl font-medium mb-4 text-white">RECOMMENDED</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {dummyRecommendedGroups.map((group) => (
-              <div 
+        {!showCategory ? (
+          <>
+            {/* Recommended section */}
+            <div className="mb-8 p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
+              <h2 className="text-xl font-medium mb-4 text-white">RECOMMENDED</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {recommendedGroups.map((group) => (
+                  <Link
+                    href={`/dashboard/groups/${group.id}`} 
+                    key={group.id} 
+                    className="p-8 bg-[#444444] hover:bg-[#555555] rounded-lg flex items-center justify-center"
+                  >
+                    <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                  </Link>
+                ))}
+              </div>
+            </div>
+            
+            {/* Browse by category */}
+            <div className="p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
+              <h2 className="text-xl font-medium mb-4 text-white">BROWSE BY CATEGORY</h2>
+              
+              {/* Clubs section */}
+              <div className="mb-6">
+                {categories.map((category)=> (
+                  <div className="mb-5 border-b border-[#3A3A3A] pb-2"> 
+                    <div key={category}>
+                      <h3 className="text-lg font-medium mb-3 text-white">
+                        {category.toUpperCase()}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> 
+                        {dummyGroups.filter(group => group.categories.includes(category)).map((group) => (
+                          <Link
+                            href={`/dashboard/groups/${group.id}`} 
+                            key={group.id} 
+                            className="p-8 bg-[#444444] hover:bg-[#555555] rounded-lg flex items-center justify-center"
+                          >
+                            <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                          </Link>
+                        ))}
+                      </div>
+                      <div className="flex justify-end mt-4">
+                        <button className="text-[#4caf9e] hover:text-[#a7ece1] cursor-pointer"
+                          onClick={() => {setShowCategory(true);
+                            setCategory(category);
+                          }}
+                            >+ SEE MORE
+                        </button> 
+                      </div> 
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+
+          // Show groups of the selected category 
+          <div className="mt-6 p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A] relative">
+            <>
+              <h2 className = "text-lg font-medium mb-4 text-white">{category.toUpperCase()}</h2>
+              <button
+                className="text-(--text-secondary) absolute top-6 right-5 text-sm hover:text-(--text-primary) cursor-pointer"
+                onClick={() => setShowCategory(false)}>
+                  {"< BACK"}
+                </button>  
+            </>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {dummyGroups.filter(group => group.categories.includes(category)).map((group) => (
+                <Link
+                href={`/dashboard/groups/${group.id}`} 
                 key={group.id} 
-                className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                className="p-8 bg-[#444444] hover:bg-[#555555] rounded-lg flex items-center justify-center"
               >
                 <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-              </div>
-            ))}
+              </Link>
+              ))}          
+                
+            </div>
+
           </div>
-        </div>
+
+        )}
         
-        {/* Browse by category */}
-        <div className="p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
-          <h2 className="text-xl font-medium mb-4 text-white">BROWSE BY CATEGORY</h2>
-          
-          {/* Clubs section */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3 text-white">CLUBS</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dummyClubGroups.map((group) => (
-                <div 
-                  key={group.id} 
-                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                >
-                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end mt-2">
-              <button className="text-[#4caf9e]">+ SEE MORE</button>
-            </div>
-          </div>
-          
-          {/* Hobbies section */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3 text-white">HOBBIES</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dummyHobbyGroups.map((group) => (
-                <div 
-                  key={group.id} 
-                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                >
-                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end mt-2">
-              <button className="text-[#4caf9e]">+ SEE MORE</button>
-            </div>
-          </div>
-          
-          {/* Education section */}
-          <div>
-            <h3 className="text-lg font-medium mb-3 text-white">EDUCATION</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {dummyEducationGroups.map((group) => (
-                <div 
-                  key={group.id} 
-                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
-                >
-                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end mt-2">
-              <button className="text-[#4caf9e]">+ SEE MORE</button>
-            </div>
-          </div>
-        </div>
       </div>
       
       {/* Right sidebar */}
@@ -208,7 +140,7 @@ export default function Groups() {
           <div>
             <h3 className="font-medium text-white">POPULAR</h3>
             <div className="space-y-4 mt-3">
-              {dummyPopularGroups.map((group, index) => (
+              {popularGroups.map((group, index) => (
                 <div key={group.id}>
                   <div className="pb-2">
                     <h4 className="text-white">{group.name}</h4>
@@ -219,7 +151,7 @@ export default function Groups() {
                       <div className="text-sm text-[#888888]">{group.mostActive}</div>
                     )}
                   </div>
-                  {index < dummyPopularGroups.length - 1 && (
+                  {index < popularGroups.length - 1 && (
                     <div className="border-b border-[#3A3A3A] my-2"></div>
                   )}
                 </div>

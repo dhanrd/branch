@@ -5,6 +5,7 @@ const dummyGroups = [
         name: 'MACHINE LEARNING',
         members: 342,
         categories: ['education', 'recommended'],
+    
 
       },
       {

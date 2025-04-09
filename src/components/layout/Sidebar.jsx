@@ -4,16 +4,12 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import dummyGroups from '@/data/dummyGroups';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, userGroups, logout } = useAuth();
-  // Hardcoded group data
-  const dummyGroups = [
-    { id: 1, name: 'MACHINE LEARNING' },
-    { id: 2, name: 'CSUS' },
-    { id: 3, name: 'WEB DEVELOPMENT' }
-  ];
+  
 
   if (!user) return null;
 

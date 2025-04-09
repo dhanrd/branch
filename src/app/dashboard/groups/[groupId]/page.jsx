@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import dummyGroups from '@/data/dummyGroups';
 
 // Dummy group posts data to match prototype
 const dummyPosts = [
@@ -55,12 +56,12 @@ export default function GroupDetail() {
   useEffect(() => {
     if (groupId) {
       // In a real app, this would be an API call or context fetch
-      const group = groups.find(g => g.id === groupId);
+      const group = dummyGroups.find(g => g.id === groupId);
       if (group) {
         setGroupInfo(group);
       }
     }
-  }, [groupId, groups]);
+  }, [groupId]);
 
   const toggleSortDropdown = () => {
     setShowSortDropdown(!showSortDropdown);

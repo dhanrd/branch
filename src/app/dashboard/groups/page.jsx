@@ -223,11 +223,39 @@ export default function Groups() {
             <>
               <h2 className = "text-lg font-medium mb-4 text-white">{category.toUpperCase()}</h2>
               <button
-                className="text-(--text-secondary) absolute top-6 right-4 text-sm hover:text-(--text-primary) cursor-pointer"
+                className="text-(--text-secondary) absolute top-6 right-5 text-sm hover:text-(--text-primary) cursor-pointer"
                 onClick={() => setShowCategory(false)}>
                   {"< BACK"}
-                </button>
+                </button>  
             </>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              {category === 'clubs' && dummyClubGroups.map((group) => (
+                <div 
+                  key={group.id} 
+                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                >
+                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                </div>
+              ))}
+              {category === 'hobbies' && dummyHobbyGroups.map((group) => (
+                <div 
+                  key={group.id} 
+                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                >
+                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                </div>
+              ))}
+              {category === 'education' && dummyEducationGroups.map((group) => (
+                <div key={group.id}
+                  className="p-8 bg-[#333333] rounded-lg flex items-center justify-center"
+                >
+                  <h3 className="text-lg font-medium text-white text-center">{group.name}</h3>
+                </div>
+              ))}
+                
+            </div>
+
           </div>
 
         )}

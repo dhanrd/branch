@@ -7,7 +7,7 @@ import dummyGroups from '@/data/dummyGroups';
 console.log(dummyGroups);
 
 export default function Groups() {
-  const { user } = useAuth();
+  const { user, joinGroup, userGroups} = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [showCategory, setShowCategory] = useState(false);
   const [category, setCategory] = useState("");

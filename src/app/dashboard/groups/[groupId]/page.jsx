@@ -35,16 +35,14 @@ const dummyPosts = [
 ];
 
 export default function GroupDetail() {
-  const { user, groups, userGroups, joinGroup } = useAuth();
+  const { user, groups, userGroups, joinGroup, leaveGroup } = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
   const [groupInfo, setGroupInfo] = useState(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('Relevant');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newPostTitle, setNewPostTitle] = useState('');
-  const [newPostContent, setNewPostContent] = useState('');
+  const [showLeaveMenu, setShowLeaveMenu] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [newCommentText, setNewCommentText] = useState('');
@@ -80,16 +78,15 @@ export default function GroupDetail() {
 
   // Get group info from the groups context
   useEffect(() => {
-    if (groupId) {
-      // In a real app, this would be an API call or context fetch
-      const group = dummyGroups.find(g => g.id === groupId);
+    if (groupId && groups.length > 0) {
+      const group = groups.find(g => g.id === groupId) || dummyGroups.find(g => g.id === groupId);
       if (group) {
         setGroupInfo(group);
         console.log("groupInfo.id:", group.id);
       }
     }
-  }, [groupId]);
-
+  }, [groupId, groups]);
+  
   useEffect(() => {
     const interval = setInterval(() => {
       setAllPosts([...allPosts]); 
@@ -103,20 +100,26 @@ export default function GroupDetail() {
     localStorage.setItem('allPosts', JSON.stringify(allPosts));
   }, [allPosts]);
   
+  
   useEffect(() => {
-    if (isPostModalOpen && selectedPost) {
+    if (selectedPost) {
       const updatedPost = allPosts.find(p => p.id === selectedPost.id);
       if (updatedPost) {
         setSelectedPost(updatedPost);
       }
     }
-  }, [allPosts, isPostModalOpen, selectedPost]);
+  }, [allPosts, selectedPost]);
   
 
   const toggleSortDropdown = () => {
     setShowSortDropdown(!showSortDropdown);
   };
 
+  const handleOpenPostModal = (post) => {
+    setSelectedPost(post);
+    setIsPostModalOpen(true);
+  };
+  
   const handleSortChange = (option) => {
     setSortOption(option);
     setShowSortDropdown(false);
@@ -138,36 +141,6 @@ export default function GroupDetail() {
   const handleReply = (comment) => {
     setNewCommentText(`@${comment.author} `);
 
-  };
-  
-
-
-  const handleSubmitPost = () => {
-
-    const newPost = {
-      id: allPosts.length + 1, 
-      title: newPostTitle,
-      author: user.username, 
-      content: newPostContent,
-      timestamp: new Date(),
-      likes: 0,
-      hasImage: false,
-      type: activeTab,       
-      groupId: groupInfo.id, 
-      likedBy: [],
-      comments: []
-    };
-  
-    setAllPosts([...allPosts, newPost]);
-  
-    setNewPostTitle('');
-    setNewPostContent('');
-    setIsModalOpen(false);
-  };
-
-  const handleOpenPostModal = (post) => {
-    setSelectedPost(post);  
-    setIsPostModalOpen(true);
   };
   
 
@@ -194,9 +167,6 @@ export default function GroupDetail() {
       })
     );
   };
-  
-  
-  
   
 
   function formatTimestamp(timestamp) {
@@ -235,7 +205,7 @@ export default function GroupDetail() {
     } else if (sortOption === 'Top') {
       filtered.sort((a, b) => b.likes - a.likes);
     }
-    // implement relevancy
+    // No need to implement relevancy
     return filtered;
   };
   
@@ -271,7 +241,6 @@ export default function GroupDetail() {
     );
   };
 
-  
 
   const handleAddComment = (postId) => {
     const newComment = {
@@ -292,17 +261,8 @@ export default function GroupDetail() {
       return p;
     }));
     
-    setSelectedPost(prev => prev && prev.id === postId ? {
-      ...prev,
-      comments: prev.comments ? [...prev.comments, newComment] : [newComment]
-    } : prev);
-  
     setNewCommentText('');
   };
-  
-  
-  
-  
   
 
   if (!groupInfo) {
@@ -352,8 +312,7 @@ export default function GroupDetail() {
           <p className="text-[#a0a0a0] mb-2">{groupInfo.description}</p>
           <div className="flex items-center gap-2">
             <button className={`px-4 py-2 rounded-md text-white ${joined ? 'bg-[#888888]' : 'bg-[#4caf9e] hover:bg-[#3d9b8d]'}`}
-              onClick={!joined ? handleJoinGroup : undefined}
-              disabled={joined}
+              onClick={() => { if (joined) { setShowLeaveMenu(prev => !prev);} else {handleJoinGroup();}}}
               >
               {joined ? 'JOINED' : 'JOIN GROUP'}
             </button>
@@ -363,6 +322,27 @@ export default function GroupDetail() {
           </div>
         </div>
       </div>
+
+        {joined && showLeaveMenu && (
+            <div className="mt-2 mb-4 bg-[#2a2a2a] text-white rounded shadow-md w-40 border border-[#444]">
+              <button
+                onClick={() => {
+                  leaveGroup(groupInfo.id);
+                  setShowLeaveMenu(false);
+                }}
+                className="w-full px-4 py-2 hover:bg-[#3a3a3a] text-left"
+              >
+                Leave Group
+              </button>
+              <button
+                onClick={() => setShowLeaveMenu(false)}
+                className="w-full px-4 py-2 hover:bg-[#3a3a3a] text-left"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+
       
       {/* Tabs */}
       <div className="mb-4">
@@ -386,188 +366,12 @@ export default function GroupDetail() {
       <div className="flex-1 overflow-y-auto px-4">
       { joined && (
       <div className="mb-4">
-        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]"
-            onClick={() => setIsModalOpen(true)}
-            >
+        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]">
           + New Post
         </button>
       </div>
       )}
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-md overflow-hidden bg-[#1e1e1e]">
-            <div className="bg-[#2d2d2d] px-6 py-3">
-              <h2 className="text-white text-xl font-bold">CREATE NEW POST</h2>
-            </div>
-            <div className="px-6 py-6">
-              {/* Post Title */}
-              <input 
-                type="text" 
-                placeholder="My New Project" 
-                className="w-full mb-4 px-4 py-2 rounded-md bg-[#2d2d2d] border border-gray-700 text-white"
-                value={newPostTitle}
-                onChange={(e) => setNewPostTitle(e.target.value)}
-              />
-
-              {/* Attach Media button */}
-              <button className="px-4 py-2 mb-4 rounded-md bg-[#3d3d3d] text-white hover:bg-[#4caf9e] transition">
-                Attach Media
-              </button>
-
-              {/* Post Content (with bigger textarea) */}
-              <textarea 
-                placeholder="This is my new project ..."
-                className="w-full mb-4 px-4 py-2 rounded-md bg-[#2d2d2d] border border-gray-700 text-white"
-                rows={6}
-                value={newPostContent}
-                onChange={(e) => setNewPostContent(e.target.value)}
-              ></textarea>
-
-              {/* Footer: Cancel / Post Buttons */}
-              <div className="flex justify-end space-x-4">
-                <button 
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-400 transition"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleSubmitPost}
-                  className="px-6 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d] transition"
-                >
-                  POST
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isPostModalOpen && selectedPost && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-md bg-[#1e1e1e] overflow-hidden">
-            {/* Modal Header */}
-            <div className="bg-[#2d2d2d] p-4 flex justify-between items-center">
-              <h2 className="text-white text-lg font-bold">{selectedPost.title}</h2>
-              <button 
-                className="text-white bg-[#444] rounded px-2 py-1"
-                onClick={() => setIsPostModalOpen(false)}
-              >
-                Close
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-4 space-y-6">
-              {/* Post Content & Stats */}
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0"></div>
-                <div>
-                  <p className="text-sm text-[#888888]">
-                    <strong>{selectedPost.author}</strong>
-                  </p>
-                  {/* Post content with a top margin */}
-                  <p className="mt-2 text-white">{selectedPost.content}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center text-[#888888] space-x-4">
-                <span>{formatTimestamp(new Date(selectedPost.timestamp))}</span>
-                {/* New clickable heart icon for post likes */}
-                <button 
-                  className="flex items-center"
-                  onClick={() => handleLike(selectedPost.id)}
-                >
-                  <svg 
-                    className={`w-5 h-5 mr-1 ${selectedPost.likedBy && selectedPost.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`}
-                    fill="currentColor" 
-                    viewBox="0 0 24 24" 
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth="2" 
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    ></path>
-                  </svg>
-                  <span>{selectedPost.likes}</span>
-                </button>
-                <span>{selectedPost.comments?.length || 0} comments</span>
-              </div>
-
-              {/* Comments Section */}
-              <div>
-                <h3 className="text-white text-lg font-bold mb-4">Comments</h3>
-                {selectedPost.comments && selectedPost.comments.map(comment => (
-                  <div
-                    key={comment.id}
-                    className="flex items-start space-x-4 mb-4 border-b border-gray-700 pb-2"
-                  >
-                    {/* Comment Avatar (blank circle) */}
-                    <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0"></div>
-                    {/* Comment Content Container */}
-                    <div className="ml-4 flex-grow">
-                      <p className="text-sm text-white mb-1">
-                        <strong>{comment.author}</strong>
-                      </p>
-                      <p className="text-gray-300 mb-2">{comment.content}</p>
-                      <div className="flex items-center space-x-2">
-                        {/* Like button for comment */}
-                        <button 
-                          className="flex items-center text-xs text-[#888888]"
-                          onClick={() => handleLikeComment(selectedPost.id, comment.id)}
-                        >
-                          <svg 
-                            className={`w-4 h-4 mr-1 ${comment.likedBy && comment.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
-                          </svg>
-                          {comment.likes || 0}
-                        </button>
-                        {/* Reply button next to like button */}
-                        <button 
-                          className="text-xs text-gray-400"
-                          onClick={() => handleReply(comment)}
-                        >
-                          Reply
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add New Comment Section */}
-              <div className="mt-4 border-t border-gray-700 pt-4 flex items-start">
-                {/* New Comment Avatar */}
-                <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0"></div>
-                <div className="flex-grow ml-4">
-                  <textarea
-                    className="w-full p-2 bg-[#2d2d2d] text-white border border-gray-600 rounded"
-                    rows="2"
-                    placeholder="Write your comment..."
-                    value={newCommentText}
-                    onChange={(e) => setNewCommentText(e.target.value)}
-                  />
-                </div>
-                {/* Post Reply button on the far right */}
-                <div className="ml-4">
-                  <button
-                    className="px-4 py-2 bg-[#4caf9e] text-white rounded hover:bg-[#3d9b8d]"
-                    onClick={() => handleAddComment(selectedPost.id)}
-                  >
-                    Post Reply
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {isInviteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -665,7 +469,7 @@ export default function GroupDetail() {
             )}
             
             <div className="flex items-center space-x-4 text-[#888888]">
-              <button className="flex items-center"> 
+              <button className="flex items-center" onClick={(e) => {e.stopPropagation(); handleLike(post.id)}}> 
                 <svg className={`w-5 h-5 mr-1 ${post.likedBy && post.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`} 
                 fill="currentColor" 
                 viewBox="0 0 24 24" 
@@ -729,6 +533,130 @@ export default function GroupDetail() {
           </div>
         ))}
       </div>
+        {isPostModalOpen && selectedPost && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="w-full max-w-3xl rounded-md bg-[#1e1e1e] overflow-hidden">
+              {/* Modal Header */}
+              <div className="bg-[#2d2d2d] p-4 flex justify-between items-center">
+                <h2 className="text-white text-lg font-bold">{selectedPost.title}</h2>
+                <button 
+                  className="text-white bg-[#444] rounded px-2 py-1"
+                  onClick={() => setIsPostModalOpen(false)}
+                >
+                  Close
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-4 space-y-6">
+                {/* Post Content & Stats */}
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0"></div>
+                  <div>
+                    <p className="text-sm text-[#888888]">
+                      <strong>{selectedPost.author}</strong>
+                    </p>
+                    {/* Post content with a top margin */}
+                    <p className="mt-2 text-white">{selectedPost.content}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center text-[#888888] space-x-4">
+                  <span>{formatTimestamp(new Date(selectedPost.timestamp))}</span>
+                  {/* New clickable heart icon for post likes */}
+                  <button 
+                    className="flex items-center"
+                    onClick={() => handleLike(selectedPost.id)}
+                  >
+                    <svg 
+                      className={`w-5 h-5 mr-1 ${selectedPost.likedBy && selectedPost.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`}
+                      fill="currentColor" 
+                      viewBox="0 0 24 24" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth="2" 
+                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                      ></path>
+                    </svg>
+                    <span>{selectedPost.likes}</span>
+                  </button>
+                  <span>{selectedPost.comments?.length || 0} comments</span>
+                </div>
+
+                {/* Comments Section */}
+                <div>
+                  <h3 className="text-white text-lg font-bold mb-4">Comments</h3>
+                  {selectedPost.comments && selectedPost.comments.map(comment => (
+                    <div
+                      key={comment.id}
+                      className="flex items-start space-x-4 mb-4 border-b border-gray-700 pb-2"
+                    >
+                      {/* Comment Avatar (blank circle) */}
+                      <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0"></div>
+                      {/* Comment Content Container */}
+                      <div className="ml-4 flex-grow">
+                        <p className="text-sm text-white mb-1">
+                          <strong>{comment.author}</strong>
+                        </p>
+                        <p className="text-gray-300 mb-2">{comment.content}</p>
+                        <div className="flex items-center space-x-2">
+                          {/* Like button for comment */}
+                          <button 
+                            className="flex items-center text-xs text-[#888888]"
+                            onClick={(e) =>{e.stopPropagation(); handleLikeComment(selectedPost.id, comment.id)}}
+                          >
+                            <svg 
+                              className={`w-4 h-4 mr-1 ${comment.likedBy && comment.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`}
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
+                            </svg>
+                            {comment.likes || 0}
+                          </button>
+                          {/* Reply button next to like button */}
+                          <button 
+                            className="text-xs text-gray-400"
+                            onClick={() => handleReply(comment)}
+                          >
+                            Reply
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add New Comment Section */}
+                <div className="mt-4 border-t border-gray-700 pt-4 flex items-start">
+                  {/* New Comment Avatar */}
+                  <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0"></div>
+                  <div className="flex-grow ml-4">
+                    <textarea
+                      className="w-full p-2 bg-[#2d2d2d] text-white border border-gray-600 rounded"
+                      rows="2"
+                      placeholder="Write your comment..."
+                      value={newCommentText}
+                      onChange={(e) => setNewCommentText(e.target.value)}
+                    />
+                  </div>
+                  {/* Post Reply button on the far right */}
+                  <div className="ml-4">
+                    <button
+                      className="px-4 py-2 bg-[#4caf9e] text-white rounded hover:bg-[#3d9b8d]"
+                      onClick={() => handleAddComment(selectedPost.id)}
+                    >
+                      Post Reply
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   </div>
   );

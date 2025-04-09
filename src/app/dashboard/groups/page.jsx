@@ -28,7 +28,7 @@ export default function Groups() {
   return (
     <div className="flex">
       {/* Main content */}
-      <div className="flex-grow pr-4">
+      <div className="relative md:flex-grow pr-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-white">FIND GROUPS</h1>
           
@@ -47,7 +47,7 @@ export default function Groups() {
         </div>
         
         {!showCategory ? (
-          <>
+          <div className="container h-150 overflow-y-auto pl-6 pr-6 pb-6">
             {/* Recommended section */}
             <div className="mb-8 p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
               <h2 className="text-xl font-medium mb-4 text-white">RECOMMENDED</h2>
@@ -65,11 +65,11 @@ export default function Groups() {
             </div>
             
             {/* Browse by category */}
-            <div className="p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
+            <div className="container p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A] mb-1">
               <h2 className="text-xl font-medium mb-4 text-white">BROWSE BY CATEGORY</h2>
               
-              {/* Clubs section */}
-              <div className="mb-6">
+              {/* Category section */}
+              <div className="mb-2">
                 {categories.map((category)=> (
                   <div key={category} className="mb-5 border-b border-[#3A3A3A] pb-2"> 
                     <div>
@@ -99,7 +99,8 @@ export default function Groups() {
                 ))}
               </div>
             </div>
-          </>
+          </div>
+          
         ) : (
 
           // Show groups of the selected category 

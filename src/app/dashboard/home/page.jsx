@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import CreatePost from '@/components/posts/createPost';
+
 
 // Dummy post data related to CS/Software Engineering
 const dummyPosts = [
@@ -30,6 +32,8 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState('feed'); // 'feed' or 'explore'
   const [sortOption, setSortOption] = useState('Relevant');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [posts, setPosts] = useState(dummyPosts);
   
   // Redirect employer users since they shouldn't have access to home
   if (user?.role === 'employer') {
@@ -48,6 +52,10 @@ export default function Home() {
   const handleSortChange = (option) => {
     setSortOption(option);
     setShowSortDropdown(false);
+  };
+
+  const handleNewPost = (post) => {
+    setPosts([post, ...posts]);
   };
 
   return (
@@ -88,7 +96,7 @@ export default function Home() {
       
       {/* New post button */}
       <div className="mb-4">
-        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]">
+        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]" onClick={() => setShowModal(true)}>
           + New Post
         </button>
       </div>
@@ -127,10 +135,19 @@ export default function Home() {
           </div>
         )}
       </div>
+
+        {showModal && (
+          <CreatePost
+            onClose={() => setShowModal(false)}
+            onSubmit={handleNewPost}
+            author={user?.username}
+          />
+        )}
+
       
       {/* Post feed */}
       <div className="space-y-4 overflow-y-auto">
-        {dummyPosts.map(post => (
+        {posts.map(post => (
           <div key={post.id} className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-md">
             <div className="flex items-start mb-3">
               <div className="w-10 h-10 rounded-full bg-[#444444] mr-3"></div>
@@ -140,7 +157,10 @@ export default function Home() {
               </div>
             </div>
             
-            <p className="text-[#e0e0e0] mb-3">{post.content}</p>
+            <div
+              className="text-[#e0e0e0] mb-3"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
             
             {post.hasImage && (
               <div className="mb-3">

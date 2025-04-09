@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import CreatePost from '@/components/posts/createPost';
+
 
 // Dummy group posts data to match prototype
 const dummyPosts = [
@@ -33,9 +35,11 @@ export default function GroupDetail() {
   const { user, groups } = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
   const [groupInfo, setGroupInfo] = useState(null);
-  const [posts] = useState(dummyPosts);
+  const [posts, setPosts] = useState(dummyPosts);
   const [sortOption, setSortOption] = useState('Relevant');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
   
   // Use useParams hook instead of accessing params directly
   const params = useParams();
@@ -69,6 +73,10 @@ export default function GroupDetail() {
   const handleSortChange = (option) => {
     setSortOption(option);
     setShowSortDropdown(false);
+  };
+
+  const handleNewPost = (post) => {
+    setPosts([post, ...posts]);
   };
 
   if (!groupInfo) {
@@ -139,10 +147,19 @@ export default function GroupDetail() {
       
       {/* New post button */}
       <div className="mb-4">
-        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]">
+        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]" onClick={() => setShowModal(true)}>
           + New Post
         </button>
       </div>
+
+      {showModal && (
+        <CreatePost
+          onClose={() => setShowModal(false)}
+          onSubmit={handleNewPost}
+          author={user?.username}
+          hideGroupSelector={true}
+        />
+      )}
       
       {/* Sort options */}
       <div className="flex justify-end mb-2 relative">
@@ -191,7 +208,10 @@ export default function GroupDetail() {
               </div>
             </div>
             
-            <p className="text-[#e0e0e0] mb-3">{post.content}</p>
+            <div
+              className="text-[#e0e0e0] mb-3"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
             
             {post.hasImage && (
               <div className="mb-3">

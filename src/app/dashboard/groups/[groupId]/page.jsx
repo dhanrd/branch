@@ -13,31 +13,57 @@ const dummyPosts = [
     title: "Post Title",
     author: "User123",
     content: "Something about machine learning.",
-    timestamp: '3 hours ago',
+    timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
     likes: 12,
-    comments: 7,
-    hasImage: false
+    hasImage: false,
+    groupId: 1,
+    likedBy: [],
+    comments: []
   },
   {
     id: 2,
     title: "Post Title",
     author: "User456",
     content: "Something about machine learning.",
-    timestamp: '1 day ago',
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
     likes: 24,
-    comments: 0,
-    hasImage: true
+    hasImage: true,
+    groupId: 1,
+    likedBy: [],
+    comments: []
   }
 ];
 
 export default function GroupDetail() {
-  const { user, groups } = useAuth();
+  const { user, groups, userGroups, joinGroup } = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
   const [groupInfo, setGroupInfo] = useState(null);
-  const [posts] = useState(dummyPosts);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [sortOption, setSortOption] = useState('Relevant');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newPostTitle, setNewPostTitle] = useState('');
+  const [newPostContent, setNewPostContent] = useState('');
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [newCommentText, setNewCommentText] = useState('');
+  const [allPosts, setAllPosts] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedPosts = localStorage.getItem('allPosts');
+      if (savedPosts) {
+        const parsed = JSON.parse(savedPosts);
+        const fixed = parsed.map(post => ({
+          ...post,
+          comments: Array.isArray(post.comments) ? post.comments : []
+        }));
+        return fixed.length > 0 ? fixed : dummyPosts.map(post => ({ ...post, type: 'posts' }));
+      }
+    }
+    return dummyPosts.map(post => ({ ...post, type: 'posts' }));
+  });
+
+   
   // Use useParams hook instead of accessing params directly
   const params = useParams();
   const groupId = params?.groupId ? parseInt(params.groupId) : null;
@@ -59,9 +85,33 @@ export default function GroupDetail() {
       const group = dummyGroups.find(g => g.id === groupId);
       if (group) {
         setGroupInfo(group);
+        console.log("groupInfo.id:", group.id);
       }
     }
   }, [groupId]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAllPosts([...allPosts]); 
+    }, 60000);
+    
+    return () => clearInterval(interval);
+  }, [allPosts]);
+  
+  
+  useEffect(() => {
+    localStorage.setItem('allPosts', JSON.stringify(allPosts));
+  }, [allPosts]);
+  
+  useEffect(() => {
+    if (isPostModalOpen && selectedPost) {
+      const updatedPost = allPosts.find(p => p.id === selectedPost.id);
+      if (updatedPost) {
+        setSelectedPost(updatedPost);
+      }
+    }
+  }, [allPosts, isPostModalOpen, selectedPost]);
+  
 
   const toggleSortDropdown = () => {
     setShowSortDropdown(!showSortDropdown);
@@ -72,12 +122,199 @@ export default function GroupDetail() {
     setShowSortDropdown(false);
   };
 
+  const handleJoinGroup = async () => {
+    joinGroup(groupInfo.id);
+  };
+
+  const handleOpenInviteModal = () => {
+    setIsInviteModalOpen(true);
+  };
+  
+  const handleCloseInviteModal = () => {
+    setIsInviteModalOpen(false);
+  };
+  
+
+  const handleReply = (comment) => {
+    setNewCommentText(`@${comment.author} `);
+
+  };
+  
+
+
+  const handleSubmitPost = () => {
+
+    const newPost = {
+      id: allPosts.length + 1, 
+      title: newPostTitle,
+      author: user.username, 
+      content: newPostContent,
+      timestamp: new Date(),
+      likes: 0,
+      hasImage: false,
+      type: activeTab,       
+      groupId: groupInfo.id, 
+      likedBy: [],
+      comments: []
+    };
+  
+    setAllPosts([...allPosts, newPost]);
+  
+    setNewPostTitle('');
+    setNewPostContent('');
+    setIsModalOpen(false);
+  };
+
+  const handleOpenPostModal = (post) => {
+    setSelectedPost(post);  
+    setIsPostModalOpen(true);
+  };
+  
+
+  const handleLike = (postId) => {
+    setAllPosts(
+      allPosts.map(post => {
+        if (post.id === postId) {
+          const likedBy = post.likedBy || [];
+          if (likedBy.includes(user.id)) {
+            return {
+              ...post,
+              likes: post.likes - 1,
+              likedBy: likedBy.filter(id => id !== user.id)
+            };
+          } else {
+            return {
+              ...post,
+              likes: post.likes + 1,
+              likedBy: [...likedBy, user.id]
+            };
+          }
+        }
+        return post;
+      })
+    );
+  };
+  
+  
+  
+  
+
+  function formatTimestamp(timestamp) {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - timestamp) / 1000);
+  
+    if (diffInSeconds < 60) {
+      return 'Just now';
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} day${days !== 1 ? 's' : ''} ago`;
+    }
+  }
+
+  const getSortedPosts = () => {
+    let filtered = allPosts.filter(
+      post => post.type === activeTab && post.groupId === Number(groupInfo.id)
+    );
+    
+    if (searchTerm.trim() !== '') {
+      filtered = filtered.filter(post =>
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.content.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+  
+
+    if (sortOption === 'Recent') {
+      filtered.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    } else if (sortOption === 'Top') {
+      filtered.sort((a, b) => b.likes - a.likes);
+    }
+    // implement relevancy
+    return filtered;
+  };
+  
+
+  const handleLikeComment = (postId, commentId) => {
+    setAllPosts(
+      allPosts.map(p => {
+        if (p.id === postId) {
+          return {
+            ...p,
+            comments: p.comments.map(comment => {
+              if (comment.id === commentId) {
+                if (!comment.likedBy.includes(user.id)) {
+                  return {
+                    ...comment,
+                    likes: comment.likes + 1,
+                    likedBy: [...comment.likedBy, user.id]
+                  };
+                } else {
+                  return {
+                    ...comment,
+                    likes: comment.likes - 1,
+                    likedBy: comment.likedBy.filter(id => id !== user.id)
+                  };
+                }
+              }
+              return comment;
+            })
+          };
+        }
+        return p;
+      })
+    );
+  };
+
+  
+
+  const handleAddComment = (postId) => {
+    const newComment = {
+      id: Date.now(), 
+      author: user.username,
+      content: newCommentText,
+      likes: 0,
+      likedBy: [] 
+    };
+  
+    setAllPosts(allPosts.map(p => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          comments: p.comments ? [...p.comments, newComment] : [newComment]
+        };
+      }
+      return p;
+    }));
+    
+    setSelectedPost(prev => prev && prev.id === postId ? {
+      ...prev,
+      comments: prev.comments ? [...prev.comments, newComment] : [newComment]
+    } : prev);
+  
+    setNewCommentText('');
+  };
+  
+  
+  
+  
+  
+
   if (!groupInfo) {
     return <div className="text-white">loading group information...</div>;
   }
 
+  const joined = userGroups.some(group => group.id === groupInfo.id);
+  const inviteLink = groupInfo ? `${window.location.origin}/invite?groupId=${groupInfo.id}` : '';
+
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-screen overflow-y-hidden">
       {/* Top search bar */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex-1">
@@ -89,12 +326,16 @@ export default function GroupDetail() {
             type="text" 
             placeholder="Search" 
             className="w-full px-4 py-2 pl-10 bg-[#3a3a3a] rounded-full text-white border-none"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="absolute left-3 top-2 text-[#888888]">
             🔍
           </div>
         </div>
       </div>
+      {groupInfo && <div>Group ID: {groupInfo.id}</div>}
+
       
       <div className="flex mb-6">
         <div className="w-16 h-16 rounded-full bg-[#444444] flex items-center justify-center mr-4 flex-shrink-0">
@@ -110,10 +351,13 @@ export default function GroupDetail() {
         <div>
           <p className="text-[#a0a0a0] mb-2">{groupInfo.description}</p>
           <div className="flex items-center gap-2">
-            <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]">
-              JOIN GROUP
+            <button className={`px-4 py-2 rounded-md text-white ${joined ? 'bg-[#888888]' : 'bg-[#4caf9e] hover:bg-[#3d9b8d]'}`}
+              onClick={!joined ? handleJoinGroup : undefined}
+              disabled={joined}
+              >
+              {joined ? 'JOINED' : 'JOIN GROUP'}
             </button>
-            <button className="px-4 py-2 bg-[#333333] text-white rounded-md">
+            <button className="px-4 py-2 bg-[#333333] text-white rounded-md" onClick={handleOpenInviteModal}>
               INVITE
             </button>
           </div>
@@ -139,11 +383,225 @@ export default function GroupDetail() {
       </div>
       
       {/* New post button */}
+      <div className="flex-1 overflow-y-auto px-4">
+      { joined && (
       <div className="mb-4">
-        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]">
+        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]"
+            onClick={() => setIsModalOpen(true)}
+            >
           + New Post
         </button>
       </div>
+      )}
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-3xl rounded-md overflow-hidden bg-[#1e1e1e]">
+            <div className="bg-[#2d2d2d] px-6 py-3">
+              <h2 className="text-white text-xl font-bold">CREATE NEW POST</h2>
+            </div>
+            <div className="px-6 py-6">
+              {/* Post Title */}
+              <input 
+                type="text" 
+                placeholder="My New Project" 
+                className="w-full mb-4 px-4 py-2 rounded-md bg-[#2d2d2d] border border-gray-700 text-white"
+                value={newPostTitle}
+                onChange={(e) => setNewPostTitle(e.target.value)}
+              />
+
+              {/* Attach Media button */}
+              <button className="px-4 py-2 mb-4 rounded-md bg-[#3d3d3d] text-white hover:bg-[#4caf9e] transition">
+                Attach Media
+              </button>
+
+              {/* Post Content (with bigger textarea) */}
+              <textarea 
+                placeholder="This is my new project ..."
+                className="w-full mb-4 px-4 py-2 rounded-md bg-[#2d2d2d] border border-gray-700 text-white"
+                rows={6}
+                value={newPostContent}
+                onChange={(e) => setNewPostContent(e.target.value)}
+              ></textarea>
+
+              {/* Footer: Cancel / Post Buttons */}
+              <div className="flex justify-end space-x-4">
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleSubmitPost}
+                  className="px-6 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d] transition"
+                >
+                  POST
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isPostModalOpen && selectedPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-3xl rounded-md bg-[#1e1e1e] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-[#2d2d2d] p-4 flex justify-between items-center">
+              <h2 className="text-white text-lg font-bold">{selectedPost.title}</h2>
+              <button 
+                className="text-white bg-[#444] rounded px-2 py-1"
+                onClick={() => setIsPostModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-4 space-y-6">
+              {/* Post Content & Stats */}
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0"></div>
+                <div>
+                  <p className="text-sm text-[#888888]">
+                    <strong>{selectedPost.author}</strong>
+                  </p>
+                  {/* Post content with a top margin */}
+                  <p className="mt-2 text-white">{selectedPost.content}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center text-[#888888] space-x-4">
+                <span>{formatTimestamp(new Date(selectedPost.timestamp))}</span>
+                {/* New clickable heart icon for post likes */}
+                <button 
+                  className="flex items-center"
+                  onClick={() => handleLike(selectedPost.id)}
+                >
+                  <svg 
+                    className={`w-5 h-5 mr-1 ${selectedPost.likedBy && selectedPost.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`}
+                    fill="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth="2" 
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    ></path>
+                  </svg>
+                  <span>{selectedPost.likes}</span>
+                </button>
+                <span>{selectedPost.comments?.length || 0} comments</span>
+              </div>
+
+              {/* Comments Section */}
+              <div>
+                <h3 className="text-white text-lg font-bold mb-4">Comments</h3>
+                {selectedPost.comments && selectedPost.comments.map(comment => (
+                  <div
+                    key={comment.id}
+                    className="flex items-start space-x-4 mb-4 border-b border-gray-700 pb-2"
+                  >
+                    {/* Comment Avatar (blank circle) */}
+                    <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0"></div>
+                    {/* Comment Content Container */}
+                    <div className="ml-4 flex-grow">
+                      <p className="text-sm text-white mb-1">
+                        <strong>{comment.author}</strong>
+                      </p>
+                      <p className="text-gray-300 mb-2">{comment.content}</p>
+                      <div className="flex items-center space-x-2">
+                        {/* Like button for comment */}
+                        <button 
+                          className="flex items-center text-xs text-[#888888]"
+                          onClick={() => handleLikeComment(selectedPost.id, comment.id)}
+                        >
+                          <svg 
+                            className={`w-4 h-4 mr-1 ${comment.likedBy && comment.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.657l-6.828-6.829a4 4 0 010-5.656z" />
+                          </svg>
+                          {comment.likes || 0}
+                        </button>
+                        {/* Reply button next to like button */}
+                        <button 
+                          className="text-xs text-gray-400"
+                          onClick={() => handleReply(comment)}
+                        >
+                          Reply
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add New Comment Section */}
+              <div className="mt-4 border-t border-gray-700 pt-4 flex items-start">
+                {/* New Comment Avatar */}
+                <div className="w-10 h-10 rounded-full bg-gray-300 flex-shrink-0"></div>
+                <div className="flex-grow ml-4">
+                  <textarea
+                    className="w-full p-2 bg-[#2d2d2d] text-white border border-gray-600 rounded"
+                    rows="2"
+                    placeholder="Write your comment..."
+                    value={newCommentText}
+                    onChange={(e) => setNewCommentText(e.target.value)}
+                  />
+                </div>
+                {/* Post Reply button on the far right */}
+                <div className="ml-4">
+                  <button
+                    className="px-4 py-2 bg-[#4caf9e] text-white rounded hover:bg-[#3d9b8d]"
+                    onClick={() => handleAddComment(selectedPost.id)}
+                  >
+                    Post Reply
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isInviteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-md bg-[#1e1e1e] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-[#2d2d2d] p-4 flex justify-between items-center">
+              <h2 className="text-white text-lg font-bold">Invite to Group</h2>
+              <button
+                className="text-white bg-[#444] rounded px-2 py-1"
+                onClick={() => setIsInviteModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+            {/* Modal Content */}
+            <div className="p-4">
+              <p className="text-white mb-2">Share this invite link with your friends:</p>
+              <div className="bg-gray-800 text-white px-3 py-2 rounded flex justify-between items-center">
+                <span className="text-sm break-all">{inviteLink}</span>
+                <button
+                  className="ml-2 text-sm text-[#4caf9e]"
+                  onClick={() => {
+                    navigator.clipboard.writeText(inviteLink);
+                    // Optionally show a notification here.
+                  }}
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       
       {/* Sort options */}
       <div className="flex justify-end mb-2 relative">
@@ -180,15 +638,17 @@ export default function GroupDetail() {
         )}
       </div>
       
+      
       {/* Post feed */}
-      <div className="space-y-4 overflow-y-auto">
-        {activeTab === 'posts' && posts.map(post => (
-          <div key={post.id} className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-md">
+      <div className="space-y-4 overflow-y-auto pb-10">
+        {activeTab === 'posts' && getSortedPosts().map(post => (
+          <div key={post.id} className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-md cursor-pointer" onClick={() => handleOpenPostModal(post)}>
             <div className="flex items-start mb-3">
               <div className="w-10 h-10 rounded-full bg-[#444444] mr-3"></div>
               <div>
                 <h3 className="font-medium text-white">{post.title}</h3>
-                <div className="text-sm text-[#888888]">{post.author} in {groupInfo.name}</div>
+                <div className="text-sm text-[#888888]">
+                {post.author} in {groupInfo.name} &bull; {formatTimestamp(new Date(post.timestamp))}</div>
               </div>
             </div>
             
@@ -205,8 +665,13 @@ export default function GroupDetail() {
             )}
             
             <div className="flex items-center space-x-4 text-[#888888]">
-              <button className="flex items-center">
-                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <button className="flex items-center"> 
+                <svg className={`w-5 h-5 mr-1 ${post.likedBy && post.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`} 
+                fill="currentColor" 
+                viewBox="0 0 24 24" 
+                xmlns="http://www.w3.org/2000/svg"
+              
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                 </svg>
                 {post.likes}
@@ -215,18 +680,56 @@ export default function GroupDetail() {
                 <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                 </svg>
-                {post.comments}
+                {post.comments.length}
               </button>
             </div>
           </div>
         ))}
         
-        {activeTab === 'resources' && (
-          <div className="text-center py-8 text-[#a0a0a0]">
-            no resources available yet.
+        {activeTab === 'resources' && getSortedPosts().map(post =>  (
+          <div key={post.id} className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-md cursor-pointer" onClick={() => handleOpenPostModal(post)}>
+            <div className="flex items-start mb-3">
+              <div className="w-10 h-10 rounded-full bg-[#444444] mr-3"></div>
+              <div>
+                <h3 className="font-medium text-white">{post.title}</h3>
+                <div className="text-sm text-[#888888]">
+                  {post.author} in {groupInfo.name} &bull; {formatTimestamp(new Date(post.timestamp))}
+                </div>
+              </div>
+            </div>
+            <p className="text-[#e0e0e0] mb-3">{post.content}</p>
+            {post.hasImage && (
+              <div className="mb-3">
+                <div className="w-full h-48 bg-[#333333] flex items-center justify-center mb-1">
+                  <svg className="w-10 h-10 text-[#666666]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+              </div>
+            )}
+            <div className="flex items-center space-x-4 text-[#888888]">
+              <button className="flex items-center">
+                <svg className={`w-5 h-5 mr-1 ${post.likedBy && post.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`}  
+                fill="currentColor" 
+                viewBox="0 0 24 24" 
+                xmlns="http://www.w3.org/2000/svg"
+                
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                {post.likes}
+              </button>
+              <button className="flex items-center">
+                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                {post.comments.length}
+              </button>
+            </div>
           </div>
-        )}
+        ))}
       </div>
     </div>
+  </div>
   );
 }

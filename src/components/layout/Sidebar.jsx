@@ -31,7 +31,7 @@ export default function Sidebar() {
           <div className="px-4 mb-2">
             <h2 className="text-[#888888] mb-2">GROUPS</h2>
             <div className="h-28 overflow-y-auto pr-2 mb-2">
-              {dummyGroups.map((group) => (
+              {userGroups.map((group) => (
                 <Link 
                   href={`/dashboard/groups/${group.id}`}
                   key={group.id}

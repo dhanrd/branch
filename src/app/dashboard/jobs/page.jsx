@@ -13,9 +13,10 @@ const dummyJobs = [
     type: 'Internship',
     description: 'Join our development team to build financial technology solutions for equity management. You\'ll work with experienced developers on real projects that impact our clients globally.',
     requirements: 'Experience with JavaScript, React, and Node.js. Knowledge of RESTful APIs. Currently enrolled in Computer Science or Software Engineering program.',
-    posted: '2 days ago',
+    posted: '2025-04-07',
     deadline: '2025-04-30',
-    salary: '$25-30/hour'
+    salary: '$25-30/hour',
+    views: 28
   },
   {
     id: 2,
@@ -25,9 +26,10 @@ const dummyJobs = [
     type: 'Internship',
     description: 'Help build tech solutions that power corporate giving and volunteer programs. You\'ll contribute to our cloud platform that connects companies with causes worldwide.',
     requirements: 'Proficiency in Java and SQL. Knowledge of Spring Framework is a plus. Strong understanding of OOP concepts.',
-    posted: '3 days ago',
+    posted: '2025-04-06',
     deadline: '2025-05-15',
-    salary: '$24-28/hour'
+    salary: '$24-28/hour',
+    views: 43
   },
   {
     id: 3,
@@ -37,9 +39,10 @@ const dummyJobs = [
     type: 'Co-op',
     description: 'Apply machine learning techniques to financial data to develop innovative solutions for our customers and internal operations.',
     requirements: 'Experience with Python, pandas, and machine learning libraries like TensorFlow or PyTorch. Strong mathematical background.',
-    posted: '1 week ago',
+    posted: '2025-04-02',
     deadline: '2025-04-22',
-    salary: '$26-32/hour'
+    salary: '$26-32/hour',
+    views: 87
   },
   {
     id: 4,
@@ -49,9 +52,10 @@ const dummyJobs = [
     type: 'New Grad',
     description: 'Join our security operations team to monitor, identify and respond to security threats across our network infrastructure.',
     requirements: 'Degree in Computer Science, Information Security or related field. Knowledge of network security principles and common security tools.',
-    posted: '5 days ago',
+    posted: '2025-04-04',
     deadline: '2025-05-01',
-    salary: '$65,000-75,000/year'
+    salary: '$65,000-75,000/year',
+    views: 62
   },
   {
     id: 5,
@@ -61,9 +65,10 @@ const dummyJobs = [
     type: 'Internship',
     description: 'Work with our cloud engineering team to develop and maintain our AWS infrastructure, implement CI/CD pipelines, and automate cloud processes.',
     requirements: 'Experience with AWS services, infrastructure as code (Terraform/CloudFormation), and scripting languages like Python or Bash.',
-    posted: '2 weeks ago',
+    posted: '2025-03-26',
     deadline: '2025-04-15',
-    salary: '$23-27/hour'
+    salary: '$23-27/hour',
+    views: 104
   },
   {
     id: 6,
@@ -73,9 +78,10 @@ const dummyJobs = [
     type: 'New Grad',
     description: 'Join our growing fintech company to help build payment processing solutions for businesses across North America.',
     requirements: 'Degree in Computer Science or related field. Experience with web development technologies and payment systems is a plus.',
-    posted: '1 week ago',
+    posted: '2025-04-02',
     deadline: '2025-05-30',
-    salary: '$70,000-80,000/year'
+    salary: '$70,000-80,000/year',
+    views: 76
   },
   {
     id: 7,
@@ -85,9 +91,10 @@ const dummyJobs = [
     type: 'Internship',
     description: 'Apply data science techniques to solve real business problems for our clients in energy, healthcare, and finance sectors.',
     requirements: 'Strong background in statistics and experience with data analysis tools. Knowledge of machine learning frameworks and SQL.',
-    posted: '3 days ago',
+    posted: '2025-04-06',
     deadline: '2025-04-25',
-    salary: '$24-29/hour'
+    salary: '$24-29/hour',
+    views: 31
   },
   {
     id: 8,
@@ -97,9 +104,10 @@ const dummyJobs = [
     type: 'Co-op',
     description: 'Help our engineering team build and maintain our deployment pipelines, monitoring systems, and cloud infrastructure.',
     requirements: 'Knowledge of Linux, containerization, and cloud platforms (AWS/Azure/GCP). Experience with CI/CD tools like Jenkins or GitHub Actions.',
-    posted: '1 week ago',
+    posted: '2025-04-02',
     deadline: '2025-05-10',
-    salary: '$25-28/hour'
+    salary: '$25-28/hour',
+    views: 52
   }
 ];
 
@@ -182,6 +190,12 @@ export default function Jobs() {
     setShowAppliedJobsModal(false);
   };
 
+  // Function to format date in a readable way
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -253,7 +267,10 @@ export default function Jobs() {
                 <h3 className="font-medium text-white">{job.title}</h3>
                 <div className="text-sm text-[#a0a0a0]">{job.company}</div>
                 <div className="text-sm text-[#a0a0a0]">{job.location} • {job.type}</div>
-                <div className="text-xs text-[#888888] mt-1">Posted {job.posted}</div>
+                <div className="flex justify-between mt-1">
+                  <div className="text-xs text-[#888888]">Posted {formatDate(job.posted)}</div>
+                  <div className="text-xs text-[#888888]">{job.views} views</div>
+                </div>
               </div>
             ))}
             
@@ -317,16 +334,23 @@ export default function Jobs() {
               </button>
             </div>
             
+            <div className="mb-2">
+              <div className="text-[#a0a0a0] text-lg font-medium">{selectedJob.views} views</div>
+            </div>
+            
             <div className="mb-4">
               <div className="text-lg text-[#e0e0e0]">{selectedJob.company}</div>
               <div className="text-[#a0a0a0]">{selectedJob.location} • {selectedJob.type}</div>
             </div>
             
             <div className="mb-6">
-              <div><span className="font-medium text-[#e0e0e0]">Posted:</span> <span className="text-[#a0a0a0]">{selectedJob.posted}</span></div>
-              <div><span className="font-medium text-[#e0e0e0]">Application Deadline:</span> <span className="text-[#a0a0a0]">{selectedJob.deadline}</span></div>
+              <div>
+                <span className="font-medium text-[#e0e0e0]">Posted:</span> 
+                <span className="text-[#a0a0a0] ml-1">{formatDate(selectedJob.posted)}</span>
+              </div>
+              <div><span className="font-medium text-[#e0e0e0]">Application Deadline:</span> <span className="text-[#a0a0a0] ml-1">{formatDate(selectedJob.deadline)}</span></div>
               {selectedJob.salary && (
-                <div><span className="font-medium text-[#e0e0e0]">Compensation:</span> <span className="text-[#a0a0a0]">{selectedJob.salary}</span></div>
+                <div><span className="font-medium text-[#e0e0e0]">Compensation:</span> <span className="text-[#a0a0a0] ml-1">{selectedJob.salary}</span></div>
               )}
             </div>
             
@@ -432,6 +456,10 @@ export default function Jobs() {
                         </h3>
                         <div className="text-sm text-[#a0a0a0]">{job.company}</div>
                         <div className="text-sm text-[#a0a0a0]">{job.location}</div>
+                        <div className="flex justify-between mt-1">
+                          <div className="text-xs text-[#888888]">Posted {formatDate(job.posted)}</div>
+                          <div className="text-xs text-[#888888]">{job.views} views</div>
+                        </div>
                       </div>
                       
                       <button 
@@ -484,6 +512,10 @@ export default function Jobs() {
                         </h3>
                         <div className="text-sm text-[#a0a0a0]">{job.company}</div>
                         <div className="text-sm text-[#a0a0a0]">{job.location}</div>
+                        <div className="flex justify-between mt-1">
+                          <div className="text-xs text-[#888888]">Posted {formatDate(job.posted)}</div>
+                          <div className="text-xs text-[#888888]">{job.views} views</div>
+                        </div>
                         <div className="text-xs text-[#4caf9e] mt-1">Application Submitted</div>
                       </div>
                     </div>

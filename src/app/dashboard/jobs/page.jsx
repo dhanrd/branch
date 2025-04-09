@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
 // Dummy job listing data
@@ -118,6 +118,7 @@ export default function Jobs() {
   const [selectedJob, setSelectedJob] = useState(null);
   const [filterOption, setFilterOption] = useState('Relevant');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [filteredJobs, setFilteredJobs] = useState(jobs);
   
   // New state for saved and applied jobs
   const [savedJobs, setSavedJobs] = useState([]);
@@ -129,8 +130,37 @@ export default function Jobs() {
   const [showSavedJobsModal, setShowSavedJobsModal] = useState(false);
   const [showAppliedJobsModal, setShowAppliedJobsModal] = useState(false);
 
-  // Show all jobs
-  const filteredJobs = jobs;
+  // Filter and sort jobs
+  useEffect(() => {
+    // Apply search filter
+    let results = jobs;
+    
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      results = jobs.filter(job => 
+        job.title.toLowerCase().includes(term) || 
+        job.company.toLowerCase().includes(term) || 
+        job.description.toLowerCase().includes(term) ||
+        job.requirements.toLowerCase().includes(term) ||
+        job.type.toLowerCase().includes(term) ||
+        job.location.toLowerCase().includes(term)
+      );
+    }
+    
+    // Apply sorting
+    if (filterOption === 'Recent') {
+      // Sort by date (newest first)
+      results = [...results].sort((a, b) => 
+        new Date(b.posted) - new Date(a.posted)
+      );
+    } else if (filterOption === 'Top') {
+      // Sort by views (highest first)
+      results = [...results].sort((a, b) => b.views - a.views);
+    }
+    // If 'Relevant', keep default order
+    
+    setFilteredJobs(results);
+  }, [jobs, searchTerm, filterOption]);
 
   const toggleFilterDropdown = () => {
     setShowFilterDropdown(!showFilterDropdown);
@@ -196,6 +226,11 @@ export default function Jobs() {
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
+  // Function to handle search input changes
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -204,6 +239,8 @@ export default function Jobs() {
           <input 
             type="text" 
             placeholder="Search" 
+            value={searchTerm}
+            onChange={handleSearchChange}
             className="w-full px-4 py-2 pl-10 bg-[#3a3a3a] rounded-full text-white border-none"
           />
           <div className="absolute left-3 top-2 text-[#888888]">

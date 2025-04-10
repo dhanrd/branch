@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import CreateJobPosting from '@/components/jobs/CreateJobPosting';
 
 // Dummy job listing data
 const dummyJobs = [
@@ -113,22 +114,21 @@ const dummyJobs = [
 
 export default function Jobs() {
   const { user } = useAuth();
-  const [jobs] = useState(dummyJobs);
+  const [jobs, setJobs] = useState(dummyJobs);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJob, setSelectedJob] = useState(null);
   const [filterOption, setFilterOption] = useState('Relevant');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState(jobs);
   
-  // New state for saved and applied jobs
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [savedJobs, setSavedJobs] = useState([]);
   const [appliedJobs, setAppliedJobs] = useState([]);
-  
-  // New state for showing our modals
   const [showApplyConfirm, setShowApplyConfirm] = useState(false);
   const [showSaveNotification, setShowSaveNotification] = useState(false);
   const [showSavedJobsModal, setShowSavedJobsModal] = useState(false);
   const [showAppliedJobsModal, setShowAppliedJobsModal] = useState(false);
+  const [showCompanyJobsModal, setShowCompanyJobsModal] = useState(false);
 
   // Filter and sort jobs
   useEffect(() => {
@@ -169,6 +169,15 @@ export default function Jobs() {
   const handleFilterChange = (option) => {
     setFilterOption(option);
     setShowFilterDropdown(false);
+  };
+
+  // Handler for job creation
+  const handleJobCreated = (newJob) => {
+    const updatedJobs = [newJob, ...jobs];
+    setJobs(updatedJobs);
+    
+    // Show a success notification
+    alert('Job posting created successfully!');
   };
 
   // Function to close the modal when clicking outside
@@ -249,7 +258,10 @@ export default function Jobs() {
         </div>
         
         {user.role === 'employer' && (
-          <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-lg">
+          <button 
+            className="px-4 py-2 bg-[#4caf9e] text-white rounded-lg hover:bg-[#3d9b8d]"
+            onClick={() => setShowCreateModal(true)}
+          >
             New Job Posting
           </button>
         )}
@@ -320,40 +332,99 @@ export default function Jobs() {
         </div>
         
         <div className="md:col-span-1">
-          <div className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-lg">
-            <button 
-              className="flex items-center mb-4 w-full hover:bg-[#333333] p-2 rounded transition-colors"
-              onClick={() => setShowSavedJobsModal(true)}
-            >
-              <svg className="w-6 h-6 text-[#888888] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
-              </svg>
-              <span className="text-[#888888]">Saved Jobs</span>
-              {savedJobs.length > 0 && (
-                <span className="ml-auto bg-[#4caf9e] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
-                  {savedJobs.length}
-                </span>
-              )}
-            </button>
-            
+        <div className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-lg">
+          {user.role === 'student' ? (
+            <>
+              <button 
+                className="flex items-center mb-4 w-full hover:bg-[#333333] p-2 rounded transition-colors"
+                onClick={() => setShowSavedJobsModal(true)}
+              >
+                <svg className="w-6 h-6 text-[#888888] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                </svg>
+                <span className="text-[#888888]">Saved Jobs</span>
+                {savedJobs.length > 0 && (
+                  <span className="ml-auto bg-[#4caf9e] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                    {savedJobs.length}
+                  </span>
+                )}
+              </button>
+              
+              <button 
+                className="flex items-center w-full hover:bg-[#333333] p-2 rounded transition-colors"
+                onClick={() => setShowAppliedJobsModal(true)}
+              >
+                <svg className="w-6 h-6 text-[#888888] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
+                <span className="text-[#888888]">Applied</span>
+                {appliedJobs.length > 0 && (
+                  <span className="ml-auto bg-[#4caf9e] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                    {appliedJobs.length}
+                  </span>
+                )}
+              </button>
+            </>
+          ) : (
             <button 
               className="flex items-center w-full hover:bg-[#333333] p-2 rounded transition-colors"
-              onClick={() => setShowAppliedJobsModal(true)}
+              onClick={() => setShowCompanyJobsModal(true)}
             >
               <svg className="w-6 h-6 text-[#888888] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
               </svg>
-              <span className="text-[#888888]">Applied</span>
-              {appliedJobs.length > 0 && (
-                <span className="ml-auto bg-[#4caf9e] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
-                  {appliedJobs.length}
-                </span>
-              )}
+              <span className="text-[#888888]">View My Applications</span>
             </button>
-          </div>
+          )}
         </div>
       </div>
+    </div>
       
+      {/* Company Jobs Modal */}
+      {showCompanyJobsModal && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 modal-overlay"
+          onClick={handleClickOutside}
+        >
+          <div className="bg-[#2d2d2d] border border-[#3a3a3a] rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-white">My Job Postings</h2>
+              <button 
+                onClick={() => setShowCompanyJobsModal(false)}
+                className="text-[#888888] hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            
+            {jobs.filter(job => job.company === user.company).length > 0 ? (
+              <div className="space-y-3">
+                {jobs
+                  .filter(job => job.company === user.company)
+                  .map(job => (
+                    <div 
+                      key={job.id} 
+                      className="p-3 border border-[#3a3a3a] bg-[#333333] rounded-lg cursor-pointer hover:bg-[#3a3a3a]"
+                      onClick={() => setSelectedJob(job)}
+                    >
+                      <h3 className="font-medium text-white">{job.title}</h3>
+                      <div className="text-sm text-[#a0a0a0]">{job.location} • {job.type}</div>
+                      <div className="flex justify-between mt-1">
+                        <div className="text-xs text-[#888888]">Posted {formatDate(job.posted)}</div>
+                        <div className="text-xs text-[#888888]">{job.views} views</div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-[#a0a0a0]">
+                You haven't posted any jobs yet.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Job details modal */}
       {selectedJob && (
         <div 
@@ -423,6 +494,14 @@ export default function Jobs() {
             )}
           </div>
         </div>
+      )}
+      
+      {/* Create job posting modal */}
+      {showCreateModal && (
+        <CreateJobPosting 
+          onClose={() => setShowCreateModal(false)}
+          onJobCreated={handleJobCreated}
+        />
       )}
       
       {/* Apply confirmation modal */}

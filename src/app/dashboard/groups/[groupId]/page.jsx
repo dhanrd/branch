@@ -5,8 +5,6 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import dummyGroups from '@/data/dummyGroups';
-import CreatePost from '@/components/posts/createPost';
-
 
 // Dummy group posts data to match prototype
 const dummyPosts = [
@@ -63,11 +61,7 @@ export default function GroupDetail() {
     return dummyPosts.map(post => ({ ...post, type: 'posts' }));
   });
 
-  
-  const [posts, setPosts] = useState(dummyPosts);
-  const [showModal, setShowModal] = useState(false);
-
-  
+   
   // Use useParams hook instead of accessing params directly
   const params = useParams();
   const groupId = params?.groupId ? parseInt(params.groupId) : null;
@@ -271,13 +265,6 @@ export default function GroupDetail() {
   };
   
 
-  const handleNewPost = (post) => {
-    setAllPosts(prev => [
-      { ...post, groupId: groupInfo.id, type: 'posts' }, // <-- Add this
-      ...prev
-    ]);
-  };
-
   if (!groupInfo) {
     return <div className="text-white">loading group information...</div>;
   }
@@ -379,7 +366,7 @@ export default function GroupDetail() {
       <div className="flex-1 overflow-y-auto px-4">
       { joined && (
       <div className="mb-4">
-        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]" onClick={() => setShowModal(true)}>
+        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]">
           + New Post
         </button>
       </div>
@@ -419,16 +406,6 @@ export default function GroupDetail() {
         </div>
       )}
 
-
-      {showModal && (
-        <CreatePost
-          onClose={() => setShowModal(false)}
-          onSubmit={handleNewPost}
-          author={user?.username}
-          hideGroupSelector={true}
-          groupId={groupInfo.id}
-        />
-      )}
       
       {/* Sort options */}
       <div className="flex justify-end mb-2 relative">
@@ -479,10 +456,7 @@ export default function GroupDetail() {
               </div>
             </div>
             
-            <div
-              className="text-[#e0e0e0] mb-3"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+            <p className="text-[#e0e0e0] mb-3">{post.content}</p>
             
             {post.hasImage && (
               <div className="mb-3">
@@ -538,7 +512,7 @@ export default function GroupDetail() {
               </div>
             )}
             <div className="flex items-center space-x-4 text-[#888888]">
-              <button className="flex items-center">
+              <button className="flex items-center" onClick={(e) => { e.stopPropagation(); handleLike(post.id); }}>
                 <svg className={`w-5 h-5 mr-1 ${post.likedBy && post.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`}  
                 fill="currentColor" 
                 viewBox="0 0 24 24" 
@@ -549,7 +523,7 @@ export default function GroupDetail() {
                 </svg>
                 {post.likes}
               </button>
-              <button className="flex items-center">
+              <button className="flex items-center" onClick={(e) => { e.stopPropagation(); handleLike(post.id); }}>
                 <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                 </svg>

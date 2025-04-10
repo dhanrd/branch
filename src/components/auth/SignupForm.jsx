@@ -37,6 +37,8 @@ export default function SignupForm() {
       formData.username, 
       formData.email,
       formData.fullName,
+      formData.company,
+      formData.clubAffiliation,
       userType
     );
     

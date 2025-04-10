@@ -35,13 +35,15 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
 
   // Signup function
-  const signup = (username, email, fullName, role) => {
+  const signup = (username, email, fullName, company, clubAffiliation, role) => {
     // Create new user
     const newUser = {
       id: users.length + 1,
       username,
       email,
       fullName,
+      company,
+      clubAffiliation,
       role
     };
     

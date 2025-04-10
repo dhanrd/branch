@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import CreatePost from '@/components/posts/createPost';
 
@@ -33,7 +33,20 @@ export default function Home() {
   const [sortOption, setSortOption] = useState('Relevant');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [posts, setPosts] = useState(dummyPosts);
+
+  const [posts, setPosts] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('homePosts');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    }
+    return dummyPosts;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('homePosts', JSON.stringify(posts));
+  }, [posts]);
   
   // Redirect employer users since they shouldn't have access to home
   if (user?.role === 'employer') {

@@ -26,25 +26,26 @@ export default function Sidebar() {
         <h1 className="text-xl font-bold text-white">Branch</h1>
       </div>
       
-      {user.role === 'student' && (
-        <>
-          <div className="px-4 mb-2">
-            <nav className="flex-1 px-4">
-              {navItems.map((item) => (
-                <Link 
-                  key={item.path}
-                  href={item.path}
-                  className={`block p-3 mb-3 rounded uppercase text-white ${
-                    pathname === item.path 
-                      ? 'bg-[#333333]' 
-                      : 'bg-[#666666] hover:bg-[#555555]'
-
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
+      <>
+      <div className="px-4 mb-2">
+        <nav className="flex-1 px-4">
+          {navItems.map((item) => (
+            <Link 
+              key={item.path}
+              href={item.path}
+              className={`block p-3 mb-3 rounded uppercase text-white ${
+                pathname === item.path 
+                  ? 'bg-[#333333]' 
+                  : 'bg-[#666666] hover:bg-[#555555]'
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </nav>
+        
+        {user.role === 'student' && (
+          <>
             <div className="border-b border-[#3a3a3a] mt-4 mb-3 mx-2"></div>
             <h2 className="text-[#888888] text-bold mb-2">GROUPS</h2>
             <div className="sidebar-group h-fit-content max-h-[30vh] overflow-y-auto pr-2 mb-5">
@@ -69,13 +70,13 @@ export default function Sidebar() {
             <Link
               href="/dashboard/groups"
               className="flex items-center justify-center p-1 text-[#4caf9e] border border-[#444444] rounded mb-1 hover:bg-[#333333]"
-
             >
               + FIND MORE
             </Link>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
+    </>
       
       
       

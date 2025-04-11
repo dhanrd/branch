@@ -2,9 +2,6 @@
 
 import { createContext, useContext, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import dummyGroups from '@/data/dummyGroups';
-
-
 
 // Initial dummy data for users
 const initialUsers = [
@@ -13,15 +10,11 @@ const initialUsers = [
 ];
 
 // Initial dummy data for groups
-/*
 const initialGroups = [
   { id: 1, name: 'Machine Learning', description: 'Discussion about ML algorithms and applications', members: [1] },
   { id: 2, name: 'CSUS', description: 'Computer Science Undergraduate Society', members: [1] },
   { id: 3, name: 'Web Development', description: 'All things web dev related', members: [1] }
-]; */
-
-const initialGroups = dummyGroups;
-
+];
 
 // Create the auth context
 const AuthContext = createContext();
@@ -64,45 +57,21 @@ export function AuthProvider({ children }) {
   // Join a group
   const joinGroup = (groupId) => {
     if (!user) return false;
-  
-    const updated = groups.map(group =>
-      group.id === groupId
-        ? {
-            ...group,
-            members: Array.isArray(group.members)
-              ? [...group.members, user.id]
-              : [user.id] // fallback if it's null or invalid
-          }
-        : group
-    );
-  
-    setGroups(updated);
-  
-    const justJoined = updated.find(group => group.id === groupId);
-    if (justJoined) {
-      setUserGroups(prev => [...prev, justJoined]);
-    }
-  
-    return true;
-  };
-
-  // leave a group
-  const leaveGroup = (groupId) => {
-    if (!user) return false;
-
-    setGroups(prevGroups =>
-      prevGroups.map(group =>
-        group.id === groupId
-          ? {
-              ...group,
-              members: group.members?.filter(id => id !== user.id) || []
-            }
+    
+    setGroups(prevGroups => 
+      prevGroups.map(group => 
+        group.id === groupId 
+          ? { ...group, members: [...group.members, user.id] } 
           : group
       )
     );
-
-    setUserGroups(prev => prev.filter(group => group.id !== groupId));
-
+    
+    // Update userGroups immediately
+    const updatedGroup = groups.find(group => group.id === groupId);
+    if (updatedGroup) {
+      setUserGroups(prev => [...prev, updatedGroup]);
+    }
+    
     return true;
   };
 
@@ -114,8 +83,7 @@ export function AuthProvider({ children }) {
       logout,
       groups,
       userGroups,
-      joinGroup,
-      leaveGroup
+      joinGroup
     }}>
       {children}
     </AuthContext.Provider>

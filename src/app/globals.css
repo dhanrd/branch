@@ -90,4 +90,12 @@ body {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
   }
+
+  /* Sidebar section*/
+  .sidebar-group {
+    height: fit-content;
+    max-height: 51vh;
+  }
 }
+
+

@@ -52,6 +52,17 @@ export function AuthProvider({ children }) {
     
     // User is immediately logged in, so update their groups
     setUserGroups([]);
+
+    // If the user has a clubAffiliation, set them as an admin for the matching group
+    if (clubAffiliation) {
+      const updatedGroups = groups.map(group =>
+        group.name.toLowerCase() === clubAffiliation.toLowerCase()
+          ? { ...group, admin: newUser.id } // Set the user as admin
+          : group
+      );
+
+    setGroups(updatedGroups);
+  }
     
     return true;
   };
@@ -62,6 +73,7 @@ export function AuthProvider({ children }) {
     setUserGroups([]);
     router.push('/');
   };
+
 
   // Join a group
   const joinGroup = (groupId) => {
@@ -108,6 +120,7 @@ export function AuthProvider({ children }) {
     return true;
   };
 
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -117,7 +130,7 @@ export function AuthProvider({ children }) {
       groups,
       userGroups,
       joinGroup,
-      leaveGroup
+      leaveGroup,
     }}>
       {children}
     </AuthContext.Provider>

@@ -5,6 +5,7 @@ const dummyGroups = [
         name: 'MACHINE LEARNING',
         members: 342,
         categories: ['education', 'recommended'],
+        admin: []
     
 
       },
@@ -14,6 +15,7 @@ const dummyGroups = [
         members: 423,
         categories: ['clubs', 'popular'],
         newMembers: '6 new members in the past day!',
+        admin: []
 
       },
       {
@@ -21,6 +23,7 @@ const dummyGroups = [
         name: 'WEB DEVELOPMENT',
         members: 102,
         categories: ['education'],
+        admin: []
 
       },
     {
@@ -28,6 +31,7 @@ const dummyGroups = [
         name: 'STUDY TIPS',
         members: 126,
         categories: ['education', 'recommended'],
+        admin: []
       },
       
       {
@@ -35,6 +39,7 @@ const dummyGroups = [
         name: 'LEARNING C++',
         members: 189,
         categories: ['education', 'recommended'],
+        admin: []
 
       },
       {
@@ -42,6 +47,7 @@ const dummyGroups = [
         name: 'WOMEN IN COMPUTER SCIENCE',
         members: 89,
         categories: ['clubs'],
+        admin: []
       },
       {
         id: 14,
@@ -49,6 +55,7 @@ const dummyGroups = [
         members: 456,
         categories: ['clubs', 'popular'],
         mostActive: 'Most active',
+        admin: []
 
       },
       {
@@ -56,6 +63,7 @@ const dummyGroups = [
         name: 'COMPETITIVE PROGRAMMING CLUB',
         members: 156,
         categories: ['clubs'],
+        admin: []
       },
       
       {
@@ -63,30 +71,35 @@ const dummyGroups = [
         name: 'MUSIC',
         members: 213,
         categories: ['hobbies'],
+        admin: []
       },
       {
         id: 8,
         name: 'HOCKEY',
         members: 187,
         categories: ['hobbies'],
+        admin: []
       },
       {
         id: 9,
         name: 'BAKING',
         members: 109,
         categories: ['hobbies'],
+        admin: []
       },
       {
         id: 10,
         name: 'RESUME HELP',
         members: 278,
         categories: ['education'],
+        admin: []
       },
       {
         id: 11,
         name: '355 STUDY GROUP',
         members: 76,
         categories: ['education'],
+        admin: []
       },
       
 ];

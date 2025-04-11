@@ -34,7 +34,7 @@ export default function Sidebar() {
                 <Link 
                   key={item.path}
                   href={item.path}
-                  className={`block p-3 mb-3 rounded uppercase text-white ${
+                  className={`block p-3 mb-3 rounded text-center uppercase text-white ${
                     pathname === item.path 
                       ? 'bg-[#333333]' 
                       : 'bg-[#666666] hover:bg-[#555555]'
@@ -92,7 +92,7 @@ export default function Sidebar() {
         
         <button 
           onClick={logout}
-          className="flex items-center mt-2 text-red-400"
+          className="flex items-center text-sm mt-2 text-red-400"
         >
         Log Out
         </button>

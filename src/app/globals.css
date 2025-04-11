@@ -87,7 +87,7 @@ body {
     max-height: 90vh
   }
 
-  .grid-layout {
+  .grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
   }
@@ -98,5 +98,6 @@ body {
     max-height: 51vh;
   }
 }
+
 
 

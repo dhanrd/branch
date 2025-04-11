@@ -32,7 +32,7 @@ export default function Joined() {
 
         <div className="container w-full overflow-y-auto pl-6 pr-6 pb-6">
           <div className="mb-8 p-6 bg-[#2A2A2A] rounded-lg border border-[#3A3A3A]">
-            <div className="grid-layout grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {userGroups.map((group) => (
                 <Link
                   href={`/dashboard/groups/${group.id}`} 

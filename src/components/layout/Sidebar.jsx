@@ -4,24 +4,12 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import dummyGroups from '@/data/dummyGroups';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, userGroups, logout } = useAuth();
-  // Hardcoded group data
-  const dummyGroups = [
-    { id: 1, name: 'MACHINE LEARNING' },
-    { id: 2, name: 'CSUS' },
-    { id: 3, name: 'WEB DEVELOPMENT' },
-    { id: 4, name: 'GAMING' },
-    { id: 5, name: 'STUDY TIPS' },
-    { id: 6, name: 'BASKETBALL' },
-    { id: 7, name: 'BASEBALL' },
-    { id: 8, name: 'COMPUTER GRAPHICS' },
-    { id: 9, name: 'COMPETITIVE PROGRAMMING' }
 
-
-  ];
 
   if (!user) return null;
 
@@ -62,18 +50,9 @@ export default function Sidebar() {
         <>
           <div className="px-4 mb-2">
 
-            <h2 className="flex justify-between text-[#868686] font-extrabold uppercase leading-tight tracking-wide mb-4">GROUPS
-              <div className="mt-0.5 flex justify-between">
-                <div className="h-6 text-right text-[#E4E4E4] text-sm font-bold uppercase leading-tight tracking-wide hover:text-white cursor-pointer">See All </div>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="6 3.5 12 20" fill="#E4E4E4" className="size-6">
-                  <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-                </svg>
-              </div>
-            </h2>
-
-
-            <div className="max-h-3/4 overflow-y-auto pr-2 mb-5">
-              {dummyGroups.map((group) => (
+            <h2 className="text-[#888888] mb-2">GROUPS</h2>
+            <div className="h-28 overflow-y-auto pr-2 mb-2">
+              {userGroups.map((group) => (
                 <Link 
                   href={`/dashboard/groups/${group.id}`}
                   key={group.id}
@@ -116,7 +95,9 @@ export default function Sidebar() {
           onClick={logout}
           className="flex items-center mt-2 text-red-400 hover:text-red-200 cursor-pointer"
         >
-          logout
+
+        Log Out
+
         </button>
       </div>
     </div>

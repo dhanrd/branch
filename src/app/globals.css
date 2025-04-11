@@ -75,19 +75,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #666666;
 }
-
-
-/* Adjust for screen size*/
-@media (min-width: 2000px) {
-  .container {
-    max-width: 1900px;
-    margin: 0 auto;
-    height: fit-content;
-    max-height: 90vh
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-  }
-}

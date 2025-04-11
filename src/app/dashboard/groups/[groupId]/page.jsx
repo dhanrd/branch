@@ -307,7 +307,6 @@ export default function GroupDetail() {
           </div>
         </div>
       </div>
-      {groupInfo && <div>Group ID: {groupInfo.id}</div>}
 
       
       <div className="flex mb-6">

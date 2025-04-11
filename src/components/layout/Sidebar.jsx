@@ -29,48 +29,55 @@ export default function Sidebar() {
       {user.role === 'student' && (
         <>
           <div className="px-4 mb-2">
-            <h2 className="text-[#888888] mb-2">GROUPS</h2>
-            <div className="h-28 overflow-y-auto pr-2 mb-2">
-              {userGroups.map((group) => (
+            <nav className="flex-1 px-4">
+              {navItems.map((item) => (
                 <Link 
-                  href={`/dashboard/groups/${group.id}`}
-                  key={group.id}
-                  className={`block p-4 mb-3 rounded text-center text-white uppercase font-medium ${
-                    pathname === `/dashboard/groups/${group.id}` 
-                      ? 'bg-[#444444]' 
-                      : 'bg-[#666666]'
+                  key={item.path}
+                  href={item.path}
+                  className={`block p-3 mb-3 rounded uppercase text-white ${
+                    pathname === item.path 
+                      ? 'bg-[#333333]' 
+                      : 'bg-[#666666] hover:bg-[#555555]'
+
                   }`}
                 >
-                  {group.name}
+                  {item.name}
                 </Link>
               ))}
+            </nav>
+            <div className="border-b border-[#3a3a3a] mt-4 mb-3 mx-2"></div>
+            <h2 className="text-[#888888] text-bold mb-2">GROUPS</h2>
+            <div className="sidebar-group h-fit-content max-h-[30vh] overflow-y-auto pr-2 mb-5">
+              {userGroups.length === 0 ? (
+                <div className="text-center text-sm text-[#888888]">No groups joined</div>
+              ) : (
+                userGroups.map((group) => (
+                  <Link 
+                    href={`/dashboard/groups/${group.id}`}
+                    key={group.id}
+                    className={`block p-4 mb-3 rounded text-center text-white uppercase font-medium ${
+                      pathname === `/dashboard/groups/${group.id}` 
+                        ? 'bg-[#444444]'
+                        : 'bg-[#666666]'
+                    }`}
+                  >
+                    {group.name}
+                  </Link>
+                ))
+              )}
             </div>
             <Link
               href="/dashboard/groups"
-              className="flex items-center justify-center p-2 text-[#4caf9e] border border-[#444444] rounded mb-4 hover:bg-[#333333]"
+              className="flex items-center justify-center p-1 text-[#4caf9e] border border-[#444444] rounded mb-1 hover:bg-[#333333]"
+
             >
               + FIND MORE
             </Link>
           </div>
-          <div className="border-b border-[#3a3a3a] mb-4 mx-4"></div>
         </>
       )}
       
-      <nav className="flex-1 px-4">
-        {navItems.map((item) => (
-          <Link 
-            key={item.path}
-            href={item.path}
-            className={`block p-3 mb-4 rounded uppercase text-white ${
-              pathname === item.path 
-                ? 'bg-[#333333]' 
-                : 'bg-[#444444] hover:bg-[#555555]'
-            }`}
-          >
-            {item.name}
-          </Link>
-        ))}
-      </nav>
+      
       
       <div className="mt-auto border-t border-[#3a3a3a] p-4">
         <Link href="/dashboard/profile">

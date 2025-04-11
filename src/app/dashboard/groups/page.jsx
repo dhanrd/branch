@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-
 import { useAuth } from '@/context/AuthContext';
 import dummyGroups from '@/data/dummyGroups';
+console.log(dummyGroups);
 
 export default function Groups() {
   const { user, joinGroup, userGroups} = useAuth();
@@ -14,7 +14,6 @@ export default function Groups() {
   const recommendedGroups = dummyGroups.filter(group => group.categories.includes('recommended'));
   const popularGroups = dummyGroups.filter(group => group.categories.includes('popular'));
   const categories = ['clubs', 'hobbies', 'education'];
-
 
   // Redirect employers who shouldn't have access to groups
   if (user?.role === 'employer') {
@@ -165,12 +164,9 @@ export default function Groups() {
           
           <div>
             <h2 className="font-medium mb-4 text-white">MY GROUPS</h2>
-            <Link
-              href="/dashboard/groups/joined"
-              className="w-full p-3 bg-[#333333] rounded-lg flex items-center justify-center text-white hover:bg-[#444444]"
-            >
-              <h3 className="text-lg font-medium text-white text-center font-upper">SEE MY JOINED GROUPS</h3>
-            </Link>
+            <button className="w-full p-3 bg-[#333333] rounded-lg text-white">
+              SEE MY JOINED GROUPS
+            </button>
           </div>
         </div>
       </div>

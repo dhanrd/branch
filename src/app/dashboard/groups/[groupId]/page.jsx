@@ -291,6 +291,14 @@ export default function GroupDetail() {
     <div className="flex flex-col h-screen overflow-y-hidden">
       {/* Top search bar */}
       <div className="flex justify-between items-center mb-4">
+        <div className="w-16 h-16 rounded-full bg-[#444444] flex items-center justify-center mr-4 flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-8 h-8 text-white">
+              <path 
+                d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-0.29 0-0.62 0.02-0.97 0.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" 
+                fill="currentColor"
+              />
+            </svg>
+          </div>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-white uppercase">{groupInfo.name}</h1>
         </div>
@@ -308,23 +316,13 @@ export default function GroupDetail() {
           </div>
         </div>
       </div>
+      
       {isAdmin && (
-        <div style={{ padding: '5px'}}>
-          Admin
-        </div>
+        <h3 className="text-white uppercase mb-3 ml-1 font-bold">Admin</h3>
       )}
-
       
       <div className="flex mb-6">
-        <div className="w-16 h-16 rounded-full bg-[#444444] flex items-center justify-center mr-4 flex-shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-8 h-8 text-white">
-            <path 
-              d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-0.29 0-0.62 0.02-0.97 0.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" 
-              fill="currentColor"
-            />
-          </svg>
-        </div>
-        
+         
         {/* Group info and buttons */}
         <div>
           <p className="text-[#a0a0a0] mb-2">{groupInfo.description}</p>
@@ -339,10 +337,13 @@ export default function GroupDetail() {
             </button>
           </div>
         </div>
-      </div>
 
+      </div>
+      
+
+      
         {joined && showLeaveMenu && (
-            <div className="mt-2 mb-4 bg-[#2a2a2a] text-white rounded shadow-md w-40 border border-[#444]">
+            <div className="mt-2 mb-4 ml-2 bg-[#2a2a2a] text-white rounded shadow-md w-40 border border-[#444]">
               <button
                 onClick={() => {
                   leaveGroup(groupInfo.id);
@@ -361,9 +362,30 @@ export default function GroupDetail() {
             </div>
           )}
 
-      
+          {/* New post button */}
+      <div className="flex space-x-2 ">
+        <div className="flex items-center space-x-2  mb-4">
+        { joined && (
+        <div className="mb-4">
+          <button className="px-3 py-2  bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]" onClick={() => setShowModal(true)}>
+            + New Post
+          </button>
+        </div>
+        )}
+
+        {/* Add event button */}
+        { joined && isAdmin && (
+        <div className="mb-4">
+          <button className="px-3 py-2  bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]" onClick={() => setShowModal(true)}>
+            + Add Event
+          </button>
+        </div>
+        )}
+      </div>
+     </div> 
+
       {/* Tabs */}
-      <div className="mb-4">
+      <div className="mb-1">
         <div className="flex space-x-2">
           <button 
             className={`px-6 py-2 rounded-md ${activeTab === 'posts' ? 'bg-[#3a3a3a] text-white' : 'bg-[#2d2d2d] text-[#888888]'}`}
@@ -372,25 +394,24 @@ export default function GroupDetail() {
             Posts
           </button>
           <button 
+            className={`px-6 py-2 rounded-md ${activeTab === 'events' ? 'bg-[#3a3a3a] text-white' : 'bg-[#2d2d2d] text-[#888888]'}`}
+            onClick={() => setActiveTab('events')}
+          >
+            Events
+          </button>
+          <button 
             className={`px-6 py-2 rounded-md ${activeTab === 'resources' ? 'bg-[#3a3a3a] text-white' : 'bg-[#2d2d2d] text-[#888888]'}`}
             onClick={() => setActiveTab('resources')}
           >
             Resources
           </button>
         </div>
-      </div>
       
-      {/* New post button */}
-      <div className="flex-1 overflow-y-auto px-4">
-      { joined && (
-      <div className="mb-4">
-        <button className="px-4 py-2 bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]" onClick={() => setShowModal(true)}>
-          + New Post
-        </button>
-      </div>
-      )}
+      
+     </div>
+      
 
-
+  
       {isInviteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-md bg-[#1e1e1e] overflow-hidden">
@@ -474,6 +495,54 @@ export default function GroupDetail() {
       {/* Post feed */}
       <div className="space-y-4 overflow-y-auto pb-10">
         {activeTab === 'posts' && getSortedPosts().map(post => (
+          <div key={post.id} className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-md cursor-pointer" onClick={() => handleOpenPostModal(post)}>
+            <div className="flex items-start mb-3">
+              <div className="w-10 h-10 rounded-full bg-[#444444] mr-3"></div>
+              <div>
+                <h3 className="font-medium text-white">{post.title}</h3>
+                <div className="text-sm text-[#888888]">
+                {post.author} in {groupInfo.name} &bull; {formatTimestamp(new Date(post.timestamp))}</div>
+              </div>
+            </div>
+            
+            <div
+              className="text-[#e0e0e0] mb-3"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+            
+            {post.hasImage && (
+              <div className="mb-3">
+                <div className="w-full h-48 bg-[#333333] flex items-center justify-center mb-1">
+                  <svg className="w-10 h-10 text-[#666666]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex items-center space-x-4 text-[#888888]">
+              <button className="flex items-center" onClick={(e) => {e.stopPropagation(); handleLike(post.id)}}> 
+                <svg className={`w-5 h-5 mr-1 ${post.likedBy && post.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`} 
+                fill="currentColor" 
+                viewBox="0 0 24 24" 
+                xmlns="http://www.w3.org/2000/svg"
+              
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                {post.likes}
+              </button>
+              <button className="flex items-center">
+                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+                {post.comments.length}
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {activeTab === 'events' && getSortedPosts().map(post => (
           <div key={post.id} className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-md cursor-pointer" onClick={() => handleOpenPostModal(post)}>
             <div className="flex items-start mb-3">
               <div className="w-10 h-10 rounded-full bg-[#444444] mr-3"></div>
@@ -689,6 +758,5 @@ export default function GroupDetail() {
           </div>
         )}
     </div>
-  </div>
   );
 }

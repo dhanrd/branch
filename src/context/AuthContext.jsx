@@ -33,6 +33,7 @@ export function AuthProvider({ children }) {
   const [groups, setGroups] = useState(initialGroups);
   const [userGroups, setUserGroups] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [admin, setAdmin] = useState(null); 
 
   // Signup function
   const signup = (username, email, fullName, company, clubAffiliation, role) => {
@@ -44,26 +45,29 @@ export function AuthProvider({ children }) {
       fullName,
       company,
       clubAffiliation,
-      role
+      role,
+      adminGroups: [],
     };
     
     setUsers([...users, newUser]);
     setUser(newUser);
-    
-    // User is immediately logged in, so update their groups
-    setUserGroups([]);
+    console.log('clubAffiliation:', clubAffiliation);
 
-    // If the user has a clubAffiliation, set them as an admin for the matching group
-    if (clubAffiliation) {
-      const updatedGroups = groups.map(group =>
-        group.name.toLowerCase() === clubAffiliation.toLowerCase()
+    const matchingGroup = groups.find(
+      (group) => group.name.toLowerCase() === clubAffiliation?.toLowerCase()
+    );
+    
+    if (matchingGroup) {
+      const updateGroups = groups.map(group =>
+        group.id === matchingGroup.id
           ? { ...group, admin: newUser.id } // Set the user as admin
           : group
       );
-
-    setGroups(updatedGroups);
-  }
-    
+      setGroups(updateGroups);
+    // User is immediately logged in, so update their groups
+      setUserGroups(prev=> [...prev, matchingGroup]);
+    }
+   
     return true;
   };
 
@@ -131,6 +135,7 @@ export function AuthProvider({ children }) {
       userGroups,
       joinGroup,
       leaveGroup,
+      admin
     }}>
       {children}
     </AuthContext.Provider>

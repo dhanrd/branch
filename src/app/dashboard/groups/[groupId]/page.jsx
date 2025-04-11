@@ -285,6 +285,7 @@ export default function GroupDetail() {
   const joined = userGroups.some(group => group.id === groupInfo.id);
   const inviteLink = groupInfo ? `${window.location.origin}/invite?groupId=${groupInfo.id}` : '';
 
+  const isAdmin = groupInfo.admin === user?.id;
 
   return (
     <div className="flex flex-col h-screen overflow-y-hidden">
@@ -307,6 +308,11 @@ export default function GroupDetail() {
           </div>
         </div>
       </div>
+      {isAdmin && (
+        <div style={{ padding: '5px'}}>
+          Admin
+        </div>
+      )}
 
       
       <div className="flex mb-6">

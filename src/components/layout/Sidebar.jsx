@@ -9,7 +9,7 @@ import dummyGroups from '@/data/dummyGroups';
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, userGroups, logout } = useAuth();
-
+  
 
   if (!user) return null;
 
@@ -38,6 +38,7 @@ export default function Sidebar() {
                     pathname === item.path 
                       ? 'bg-[#333333]' 
                       : 'bg-[#666666] hover:bg-[#555555]'
+
                   }`}
                 >
                   {item.name}
@@ -68,6 +69,7 @@ export default function Sidebar() {
             <Link
               href="/dashboard/groups"
               className="flex items-center justify-center p-1 text-[#4caf9e] border border-[#444444] rounded mb-1 hover:bg-[#333333]"
+
             >
               + FIND MORE
             </Link>

@@ -27,7 +27,6 @@ export default function Sidebar() {
       </div>
       
       {user.role === 'student' && (
-        <>
           <div className="px-4 mb-2">
             <nav className="flex-1 px-4">
               {navItems.map((item) => (
@@ -69,13 +68,12 @@ export default function Sidebar() {
             <Link
               href="/dashboard/groups"
               className="flex items-center justify-center p-1 text-[#4caf9e] border border-[#444444] rounded mb-1 hover:bg-[#333333]"
-
             >
               + FIND MORE
             </Link>
-          </div>
-        </>
-      )}
+            </div>
+        )}
+      
       
       
       

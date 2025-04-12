@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import CreatePost from '@/components/posts/createPost';
@@ -28,7 +29,9 @@ const dummyPosts = [
 ];
 
 export default function Home() {
-  const { user } = useAuth();
+
+  const router = useRouter();
+  const { user, userGroups } = useAuth();
   const [activeTab, setActiveTab] = useState('feed'); // 'feed' or 'explore'
   const [sortOption, setSortOption] = useState('Relevant');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
@@ -68,7 +71,13 @@ export default function Home() {
   };
 
   const handleNewPost = (post) => {
-    setPosts([post, ...posts]);
+    if (post.audience === 'everyone') {
+      setPosts([post, ...posts]);
+    } else {
+      // ✅ Redirect to the group page with post data as query params (or via sessionStorage)
+      sessionStorage.setItem('newGroupPost', JSON.stringify(post));
+      router.push(`/dashboard/groups/${post.groupId}`);
+    }
   };
 
   return (
@@ -155,6 +164,8 @@ export default function Home() {
             onSubmit={handleNewPost}
             author={user?.username}
             groupId={null}
+            hideGroupSelector={false} // show group selector on homepage
+            userGroups={userGroups}
           />
         )}
 

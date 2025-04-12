@@ -1,6 +1,6 @@
 # Branch - Social Media Platform
 
-[Check Out The App](https://branch-zeta.vercel.app/)
+#### **Check out our app**- [Branch](https://branch-zeta.vercel.app/)
 
 This README should serve as a comprehensive overview of the codebase, explaining structure, components, and relationships between different moving parts.
 

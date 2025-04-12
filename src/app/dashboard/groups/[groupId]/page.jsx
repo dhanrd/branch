@@ -66,6 +66,7 @@ export default function GroupDetail() {
   
   const [posts, setPosts] = useState(dummyPosts);
   const [showModal, setShowModal] = useState(false);
+  const [isEvent, setIsEvent] = useState(false);
 
   
   // Use useParams hook instead of accessing params directly
@@ -195,8 +196,13 @@ export default function GroupDetail() {
 
   const getSortedPosts = () => {
     let filtered = allPosts.filter(
-      post => post.type === activeTab && post.groupId === Number(groupInfo.id)
+      post => post.type === activeTab && post.groupId === Number(groupInfo.id) 
     );
+
+    
+
+
+    
     
     if (searchTerm.trim() !== '') {
       filtered = filtered.filter(post =>
@@ -273,7 +279,7 @@ export default function GroupDetail() {
 
   const handleNewPost = (post) => {
     setAllPosts(prev => [
-      { ...post, groupId: groupInfo.id, type: 'posts' }, // <-- Add this
+      { ...post, groupId: groupInfo.id, type: 'posts' }, 
       ...prev
     ]);
   };
@@ -367,7 +373,12 @@ export default function GroupDetail() {
         <div className="flex items-center space-x-2  mb-4">
         { joined && (
         <div className="mb-4">
-          <button className="px-3 py-2  bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]" onClick={() => setShowModal(true)}>
+          <button className="px-3 py-2  bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]" 
+          onClick={() => {
+            setIsEvent(false);
+            setShowModal(true);
+          }}
+          >
             + New Post
           </button>
         </div>
@@ -376,7 +387,12 @@ export default function GroupDetail() {
         {/* Add event button */}
         { joined && isAdmin && (
         <div className="mb-4">
-          <button className="px-3 py-2  bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]" onClick={() => setShowModal(true)}>
+          <button className="px-3 py-2  bg-[#4caf9e] text-white rounded-md hover:bg-[#3d9b8d]"
+          onClick={() => 
+          { setIsEvent(true);
+            setShowModal(true);
+          }}
+          >
             + Add Event
           </button>
         </div>
@@ -453,6 +469,7 @@ export default function GroupDetail() {
           author={user?.username}
           hideGroupSelector={true}
           groupId={groupInfo.id}
+          isEvent={isEvent}
         />
       )}
       
@@ -493,35 +510,35 @@ export default function GroupDetail() {
       
       
       {/* Post feed */}
-      <div className="space-y-4 overflow-y-auto pb-10">
-        {activeTab === 'posts' && getSortedPosts().map(post => (
-          <div key={post.id} className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-md cursor-pointer" onClick={() => handleOpenPostModal(post)}>
-            <div className="flex items-start mb-3">
-              <div className="w-10 h-10 rounded-full bg-[#444444] mr-3"></div>
-              <div>
-                <h3 className="font-medium text-white">{post.title}</h3>
-                <div className="text-sm text-[#888888]">
-                {post.author} in {groupInfo.name} &bull; {formatTimestamp(new Date(post.timestamp))}</div>
+        <div className="space-y-4 overflow-y-auto pb-10">
+          {activeTab === 'posts' && getSortedPosts().map(post => (
+            <div key={post.id} className="p-4 bg-[#2d2d2d] border border-[#3a3a3a] rounded-md cursor-pointer" onClick={() => handleOpenPostModal(post)}>
+          <div className="flex items-start mb-3">
+            <div className="w-10 h-10 rounded-full bg-[#444444] mr-3"></div>
+            <div>
+              <h3 className="font-medium text-white">{post.title}</h3>
+              <div className="text-sm text-[#888888]">
+              {post.author} in {groupInfo.name} &bull; {formatTimestamp(new Date(post.timestamp))}</div>
+            </div>
+          </div>
+          
+          <div
+            className="text-[#e0e0e0] mb-3"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+          
+          {post.hasImage && (
+            <div className="mb-3">
+              <div className="w-full h-48 bg-[#333333] flex items-center justify-center mb-1">
+            <svg className="w-10 h-10 text-[#666666]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
               </div>
             </div>
-            
-            <div
-              className="text-[#e0e0e0] mb-3"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-            
-            {post.hasImage && (
-              <div className="mb-3">
-                <div className="w-full h-48 bg-[#333333] flex items-center justify-center mb-1">
-                  <svg className="w-10 h-10 text-[#666666]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                </div>
-              </div>
-            )}
-            
-            <div className="flex items-center space-x-4 text-[#888888]">
-              <button className="flex items-center" onClick={(e) => {e.stopPropagation(); handleLike(post.id)}}> 
+          )}
+          
+          <div className="flex items-center space-x-4 text-[#888888]">
+            <button className="flex items-center" onClick={(e) => {e.stopPropagation(); handleLike(post.id)}}> 
                 <svg className={`w-5 h-5 mr-1 ${post.likedBy && post.likedBy.includes(user.id) ? 'text-red-500' : 'text-white'}`} 
                 fill="currentColor" 
                 viewBox="0 0 24 24" 

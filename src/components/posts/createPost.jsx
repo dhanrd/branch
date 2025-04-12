@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import JoditEditor from 'jodit-react';
 
-export default function CreatePostModal({ onClose, onSubmit, author = 'You', hideGroupSelector = false, groupId = null }) {
+export default function CreatePostModal({ onClose, onSubmit, author = 'You', hideGroupSelector = false, groupId = null, isEvent }) {
   
   const editor = useRef(null);
   const [step, setStep] = useState(1);
@@ -11,7 +11,9 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
     title: '',
     content: '',
     media: null,
-    audience: 'everyone'
+    audience: 'everyone',
+    eventDate: '',
+    eventTime: '',
   });
 
   useEffect(() => {
@@ -55,7 +57,8 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
       comments: 0,
       hasImage: !!formData.media,
       audience: formData.audience,
-      groupId: groupId
+      groupId: groupId,
+      type: isEvent ? 'event' : 'posts',
     };
     
     onSubmit(newPost);
@@ -74,9 +77,9 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
       <div className="text-[#4caf9e] text-2xl">✔️</div>
       <div>
         <p className="text-sm font-medium">
-          '{formData.title || "Your post"}' was posted successfully to 'Everyone'
+          '{formData.title || `Your  ${isEvent ? 'event' : 'post'}`}' was posted successfully to 'Everyone'
         </p>
-        <a href="#" className="text-[#4caf9e] underline text-sm">See post</a>
+        <a href="#" className="text-[#4caf9e] underline text-sm">See {isEvent ? 'event' : 'post'}</a>
       </div>
     </div>
     )}
@@ -85,7 +88,9 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
     <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
       <div className="w-[1000px] h-[600px] bg-[#3d3d3d] rounded-md shadow-lg border border-[#444] flex flex-col">
         <div className="flex justify-between items-center px-6 py-4 bg-[#555555] rounded-t-md">
-          <h2 className="text-sm font-semibold text-white tracking-wide uppercase">Create New Post</h2>
+
+          <h2 className="text-sm font-semibold text-white tracking-wide uppercase">
+            {isEvent ? 'Create New Event' : 'Create New Post'}</h2>
           <button onClick={onClose} className="text-white text-xl hover:text-gray-300 transition">×</button>
         </div>
 
@@ -112,6 +117,13 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
                   📎 Attach Media
                 </div>
               </label>
+              {isEvent && (
+                <div className="flex items-center bg-[#5c5c5c] text-sm px-3 py-1 rounded hover:bg-[#555] transition">
+                  <h3 className="text-sm font-semibold text-white">Event Date & Time: </h3>
+                  <input type="date" name="eventDate" className="bg-[#5c5c5c] text-sm px-3 py-1 rounded hover:bg-[#555] transition" value={formData.eventDate} onChange={handleChange} />
+                  <input type="time" name="eventTime" className="bg-[#5c5c5c] text-sm px-3 py-1 rounded hover:bg-[#555] transition" value={formData.eventTime} onChange={handleChange}/>
+                </div>
+              )}
             </div>
 
             <JoditEditor
@@ -142,9 +154,15 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col justify-between flex-grow p-6 space-y-6">
             {/* 2nd popup */}
-            <div className="bg-[#2e2e2e] p-4 rounded text-white space-y-2">
+            <div className="bg-[#2e2e2e] p-4 rounded text-white space-y-2 relative">
               <p className="text-sm text-gray-300">{author}</p>
               <h3 className="text-lg font-semibold">{formData.title}</h3>
+              {isEvent && (
+                <div className="absolute top-4 right-4 text-right">
+                  <h3 className="text-sm font-semibold">Event Date & Time:</h3>
+                  <p>{formData.eventDate} at {formData.eventTime}</p>
+                </div>
+              )}
               <div dangerouslySetInnerHTML={{ __html: formData.content }} />
             </div>
 
@@ -204,6 +222,5 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
     </div>
     )}
     </>
-
   );
 }

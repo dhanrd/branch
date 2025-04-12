@@ -282,6 +282,7 @@ export default function GroupDetail() {
       { ...post, groupId: groupInfo.id, type: 'posts' }, 
       ...prev
     ]);
+    
   };
 
   if (!groupInfo) {

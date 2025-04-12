@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import JoditEditor from 'jodit-react';
 
-export default function CreatePostModal({ onClose, onSubmit, author = 'You', hideGroupSelector = false, groupId = null }) {
+export default function CreatePostModal({ onClose, onSubmit, author = 'You', hideGroupSelector = false, userGroups = [], groupId = null }) {
   
   const editor = useRef(null);
   const [step, setStep] = useState(1);
@@ -11,7 +11,7 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
     title: '',
     content: '',
     media: null,
-    audience: 'everyone'
+    audience: 'everyone',
   });
 
   useEffect(() => {
@@ -43,8 +43,15 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
     }
     setStep(2);
   };
+  
 
   const handleSubmit = (e) => {
+
+    if (!formData.audience) {
+      alert('Please select where to post (Everyone or a Group).');
+      return;
+    }
+
     e.preventDefault();
     const newPost = {
       id: Date.now(),
@@ -55,7 +62,7 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
       comments: 0,
       hasImage: !!formData.media,
       audience: formData.audience,
-      groupId: groupId
+      groupId: formData.groupId || null
     };
     
     onSubmit(newPost);
@@ -141,64 +148,88 @@ export default function CreatePostModal({ onClose, onSubmit, author = 'You', hid
           </form>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col justify-between flex-grow p-6 space-y-6">
-            {/* 2nd popup */}
-            <div className="bg-[#2e2e2e] p-4 rounded text-white space-y-2">
-              <p className="text-sm text-gray-300">{author}</p>
-              <h3 className="text-lg font-semibold">{formData.title}</h3>
-              <div dangerouslySetInnerHTML={{ __html: formData.content }} />
-            </div>
+          {/* 2nd popup */}
+          <div className="bg-[#2e2e2e] p-4 rounded text-white space-y-2">
+            <p className="text-sm text-gray-300">{author}</p>
+            <h3 className="text-lg font-semibold">{formData.title}</h3>
+            <div dangerouslySetInnerHTML={{ __html: formData.content }} />
+          </div>
 
-            <div>
-              <p className="font-semibold">Post To:</p>
-              <label className="flex items-center space-x-2">
-                <input type="radio" name="audience" value="everyone" defaultChecked />
-                <span>Everyone</span>
-              </label>
+          <div className="space-y-2">
+            <p className="font-semibold text-white">Post To:</p>
 
-              {!hideGroupSelector && (
+            {/* ✅ Always show 'Everyone' */}
+            <label className="flex items-center gap-2 text-white">
+              <input
+                type="radio"
+                name="audience"
+                value="everyone"
+                checked={formData.audience === 'everyone'}
+                onChange={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    audience: 'everyone',
+                    groupId: null
+                  }))
+                }
+              />
+              <span>Everyone</span>
+            </label>
+
+            {/* ✅ Only show groups if selector is enabled and user has joined groups */}
+            {!hideGroupSelector && userGroups.length > 0 && (
               <>
                 <p className="font-semibold mt-4">Groups</p>
-                <div className="ml-4 flex gap-6">
-                  <label className="flex items-center space-x-2 text-white cursor-pointer">
+                <div className="ml-4 space-y-2">
+                {userGroups.map((group) => (
+                  <label key={group.id} className="flex items-center space-x-2 text-white cursor-pointer">
                     <input
-                      type="checkbox"
-                      className="appearance-none w-2 h-2 rounded-full border border-white bg-transparent checked:bg-blue-500 checked:ring-2 checked:ring-white p-[2px] transition"
+                      type="radio"
+                      name="audience"
+                      value={group.name}
+                      checked={formData.audience === group.name}
+                      onChange={() =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          audience: group.name,
+                          groupId: group.id
+                        }))
+                      }
                     />
-                    <span>Java Resources</span>
+                    <span>{group.name}</span>
                   </label>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
 
-                  <label className="flex items-center space-x-2 text-white cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="appearance-none w-2 h-2 rounded-full border border-white bg-transparent checked:bg-blue-500 checked:ring-2 checked:ring-white p-[2px] transition"
-                    />
-                    <span>Gaming</span>
-                  </label>
-                </div>
-              </>
-              )}
-            </div>
+        {/* ✅ Post/Draft/Back Buttons */}
+        <div className="flex justify-between items-center mt-6">
+          <button
+            type="button"
+            onClick={() => setStep(1)}
+            className="px-4 py-2 bg-[#555] text-white rounded hover:bg-[#666]"
+          >
+            &lt;
+          </button>
 
-
-              <div className="flex justify-between items-center">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="px-4 py-2 bg-[#555] text-white rounded hover:bg-[#666]"
-                >
-                  &lt;
-                </button>
-
-                <div className="flex gap-3">
-                  <button type="button" className="px-5 py-2 bg-[#777] text-white rounded hover:bg-[#888]">
-                    Draft
-                  </button>
-                  <button type="submit" className="px-5 py-2 bg-[#4caf9e] text-white rounded font-semibold hover:bg-[#3d9b8d]">
-                    Post
-                  </button>
-                </div>
-            </div>
-          </form>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              className="px-5 py-2 bg-[#777] text-white rounded hover:bg-[#888]"
+            >
+              Draft
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 bg-[#4caf9e] text-white rounded font-semibold hover:bg-[#3d9b8d]"
+            >
+              Post
+            </button>
+          </div>
+        </div>
+      </form>
         )}
       </div>
     </div>
